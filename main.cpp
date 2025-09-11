@@ -4,5 +4,16 @@
 
 int main ()
 {
-    Server s;
+    try
+    {
+        Server s;
+
+        s.StartServer();
+        
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+    
 }

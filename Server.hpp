@@ -12,11 +12,12 @@
 #include <vector>
 #include <unistd.h>
 #include <fcntl.h>
+#include <cstring>
 
 #define RED "\e[1;31m"
-#define WHI "\e[0;37m"
-#define GRE "\e[1;32m"
-#define YEL "\e[1;33m"
+#define GREEN "\e[1;32m"
+#define WHITE "\e[0;37m"
+#define YELLO "\e[1;33m"
 
 class Server
 {
@@ -26,11 +27,14 @@ class Server
     int sockfd;
     std::vector<Claint> claints;
     std::vector<pollfd> poll_fds;
+    void CreateSocket();
+    void MainLoop();
 
     public:
     Server();
-    void CreateSocket();
-
+    void StartServer();
+    void NewClaint();
+    void NewData(int);
 };
 
 #endif
