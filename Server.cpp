@@ -104,7 +104,7 @@ void Server::NewData(int Cfd)
     }
     else
     {
-        std::cout << buffer << std::endl;
+        std::cout << buffer;
     }
 }
 

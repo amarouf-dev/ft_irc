@@ -9,11 +9,9 @@ int main ()
         Server s;
 
         s.StartServer();
-        
     }
     catch(const std::exception& e)
     {
         std::cerr << e.what() << '\n';
     }
-    
 }
