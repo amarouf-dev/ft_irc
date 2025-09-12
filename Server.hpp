@@ -27,14 +27,16 @@ class Server
     int sockfd;
     std::vector<Claint> claints;
     std::vector<pollfd> poll_fds;
+
     void CreateSocket();
     void MainLoop();
-
-    public:
-    Server();
-    void StartServer();
     void NewClaint();
     void NewData(int);
+
+    public:
+
+    Server();
+    void StartServer();
 };
 
 #endif

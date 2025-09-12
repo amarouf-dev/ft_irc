@@ -19,24 +19,24 @@ void Server::StartServer()
 
 void Server::CreateSocket()
 {
-    this->sockfd = socket(AF_INET, SOCK_STREAM, 0); // Socket clreation
+    this->sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd == -1)
         throw (std::runtime_error("Socket Failed !"));
     
-    sockaddr_in addr; // set the socket's options to bind it
+    sockaddr_in addr;
 
-    addr.sin_family = AF_INET; // IPV4
+    addr.sin_family = AF_INET;
     addr.sin_port = this->port;
-    addr.sin_addr.s_addr = INADDR_ANY; // bind it to all the interfaces on the device
+    addr.sin_addr.s_addr = INADDR_ANY;
 
     int opt = 1;
-    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) // set socket options
+    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1)
         throw (std::runtime_error("setsockopt Failed !"));
 
-    if (fcntl(sockfd, F_SETFL, O_NONBLOCK) == -1) // gives the socket a non_blocking option (it doesn't wait for data to be recvd)
+    if (fcntl(sockfd, F_SETFL, O_NONBLOCK) == -1)
         throw (std::runtime_error("fcntl Failed !"));
 
-    if (bind(sockfd, reinterpret_cast<sockaddr *>(&addr), sizeof(addr)) == -1) // gives the socket a port and an address
+    if (bind(sockfd, reinterpret_cast<sockaddr *>(&addr), sizeof(addr)) == -1)
         throw (std::runtime_error("bind Failed !"));
 
     if (listen(sockfd, SOMAXCONN) == -1)
@@ -61,7 +61,7 @@ void Server::MainLoop()
                 throw (std::runtime_error("Poll failed !"));
             if (poll_fds[i].revents == POLLIN)
             {
-                if (poll_fds[i].fd == sockfd) // The sockfd is set to lesten (server socket) so it only tells if there is a new claint
+                if (poll_fds[i].fd == sockfd)
                     NewClaint();
                 else
                     NewData(poll_fds[i].fd);
