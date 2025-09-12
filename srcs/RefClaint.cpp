@@ -1,6 +1,6 @@
 
 
-#include "Server.hpp"
+#include "../headers/Server.hpp"
 
 int main ()
 {

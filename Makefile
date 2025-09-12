@@ -4,11 +4,15 @@ RM = rm -rf
 CPP = c++
 CPPFlags = -Wextra -Wall -Werror -std=c++98
 
-SRC = Claint.cpp  main.cpp  Server.cpp \
+HDIR = headers
+SRCDIR = srcs
 
-CSRC = RefClaint.cpp \
+HDR = $(HDIR)/Claint.hpp  $(HDIR)/Server.hpp \
 
-HDR = Claint.hpp  Server.hpp \
+
+CSRC = $(SRCDIR)/RefClaint.cpp \
+
+SRC = $(SRCDIR)/Claint.cpp  $(SRCDIR)/main.cpp $(SRCDIR)/Server.cpp \
 
 OSRC = $(SRC:.cpp=.o)
 COSRC = $(CSRC:.cpp=.o)
