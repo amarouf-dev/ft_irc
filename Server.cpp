@@ -94,11 +94,11 @@ void Server::NewClaint()
 
 void Server::NewData(int Cfd)
 {
-    char buffer[1024];
+    char buffer[BUFSIZE];
 
     std::memset(buffer, 0, sizeof(buffer));
 
-    if (recv(Cfd, buffer, 1023, 0) <= 0)
+    if (recv(Cfd, buffer, (BUFSIZE - 1), 0) < 0)
     {
         std::cout << RED << "Claint (" << Cfd << ") Disconnected !" << std::endl;
     }

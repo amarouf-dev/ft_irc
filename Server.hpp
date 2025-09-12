@@ -18,6 +18,7 @@
 #define GREEN "\e[1;32m"
 #define WHITE "\e[0;37m"
 #define YELLO "\e[1;33m"
+#define BUFSIZE 1024
 
 class Server
 {
