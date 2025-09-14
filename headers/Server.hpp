@@ -3,7 +3,7 @@
 #ifndef SERVERRRR
 #define SERVERRRR
 
-#include "Claint.hpp"
+#include <set>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -13,8 +13,9 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <cstring>
-#include <set>
 #include <algorithm>
+#include "Claint.hpp"
+#include "Channel.hpp"
 
 #define RED "\e[1;31m"
 #define GREEN "\e[1;32m"
@@ -31,12 +32,14 @@ class Server
     int sockfd;
     std::vector<Claint> claints;
     std::vector<pollfd> poll_fds;
+    std::vector<Channel> chnl;
 
     void CreateSocket();
     void MainLoop();
     void NewClaint();
     void NewData(int);
     void removeclaint(int);
+    void createchannel(std::string, int);
 
     public:
 

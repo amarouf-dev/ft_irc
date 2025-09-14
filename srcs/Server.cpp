@@ -114,6 +114,32 @@ void Server::NewClaint()
     std::cout << GREEN << "Client (" << nc.fd << ") Connected" << WHITE << std::endl;
 }
 
+void Server::createchannel(std::string n, int fd)
+{
+    Channel ch;
+    Claint *c;
+
+    for (unsigned long i = 0; i < claints.size(); i ++)
+    {
+        if (claints[i].GetFd() == fd)
+        {
+            c = &claints[i];
+        }
+    }
+
+    for (unsigned long i = 0; i < chnl.size(); i ++)
+    {
+        if (chnl[i].GetName() == n)
+        {
+            chnl[i].join_channel(c);
+            return ;
+        }
+    }
+    ch.Initchannel(n, c);
+    this->chnl.push_back(ch);
+}
+
+
 void Server::NewData(int Cfd)
 {
     std::string msg;
@@ -129,8 +155,15 @@ void Server::NewData(int Cfd)
     else
     {
         msg = buffer;
-        std::cout << msg.size() << std::endl;
-        std::cout << buffer;
+        msg.erase(msg.size() - 1, 1);
+        if (msg == "/JOIN")
+        {
+            createchannel(msg, Cfd);
+        }
+        else
+        {
+            std::cout << msg << std::endl;
+        }
     }
 }
 

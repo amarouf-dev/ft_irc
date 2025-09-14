@@ -7,12 +7,12 @@ CPPFlags = -Wextra -Wall -Werror -std=c++98
 HDIR = headers
 SRCDIR = srcs
 
-HDR = $(HDIR)/Claint.hpp  $(HDIR)/Server.hpp \
+HDR = $(HDIR)/Claint.hpp  $(HDIR)/Server.hpp $(HDIR)/Channel.hpp \
 
 
 CSRC = $(SRCDIR)/RefClaint.cpp \
 
-SRC = $(SRCDIR)/Claint.cpp  $(SRCDIR)/main.cpp $(SRCDIR)/Server.cpp \
+SRC = $(SRCDIR)/Claint.cpp  $(SRCDIR)/main.cpp $(SRCDIR)/Server.cpp $(SRCDIR)/Channel.cpp\
 
 OSRC = $(SRC:.cpp=.o)
 COSRC = $(CSRC:.cpp=.o)
