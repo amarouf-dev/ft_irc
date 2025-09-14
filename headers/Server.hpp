@@ -13,12 +13,15 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <cstring>
+#include <set>
+#include <algorithm>
 
 #define RED "\e[1;31m"
 #define GREEN "\e[1;32m"
 #define WHITE "\e[0;37m"
 #define YELLO "\e[1;33m"
 #define BUFSIZE 1024
+
 
 class Server
 {
@@ -33,6 +36,7 @@ class Server
     void MainLoop();
     void NewClaint();
     void NewData(int);
+    void removeclaint(int);
 
     public:
 

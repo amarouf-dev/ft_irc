@@ -51,6 +51,26 @@ void Server::CreateSocket()
     poll_fds.push_back(pfd);
 }
 
+void Server::removeclaint(int fd)
+{
+    for (unsigned long i = 0; i < poll_fds.size(); i ++)
+    {
+        if (poll_fds[i].fd == fd)
+        {
+            poll_fds.erase(poll_fds.begin() + i);
+        }
+    }
+    for (unsigned long i = 0; i < claints.size(); i ++)
+    {
+        if (claints[i].GetFd() == fd)
+        {
+            close (claints[i].GetFd());
+            claints.erase(claints.begin() + i);
+        }
+    }
+    close(fd);
+}
+
 void Server::MainLoop()
 {
     while (true)
@@ -64,7 +84,9 @@ void Server::MainLoop()
                 if (poll_fds[i].fd == sockfd)
                     NewClaint();
                 else
+                {
                     NewData(poll_fds[i].fd);
+                }
             }
         }
     }
@@ -94,16 +116,20 @@ void Server::NewClaint()
 
 void Server::NewData(int Cfd)
 {
+    std::string msg;
     char buffer[BUFSIZE];
 
     std::memset(buffer, 0, sizeof(buffer));
 
-    if (recv(Cfd, buffer, (BUFSIZE - 1), 0) < 0)
+    if (recv(Cfd, buffer, (BUFSIZE - 1), 0) <= 0)
     {
         std::cout << RED << "Claint (" << Cfd << ") Disconnected !" << std::endl;
+        removeclaint(Cfd);
     }
     else
     {
+        msg = buffer;
+        std::cout << msg.size() << std::endl;
         std::cout << buffer;
     }
 }
