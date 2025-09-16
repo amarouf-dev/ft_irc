@@ -155,16 +155,32 @@ void Server::NewData(int Cfd)
     else
     {
         msg = buffer;
-        msg.erase(msg.size() - 1, 1);
-        if (msg == "/JOIN")
+
+        if (!msg.empty() && (msg[msg.size()-1] == '\n' || msg[msg.size()-1] == '\r'))
+            msg.erase(msg.find_last_not_of("\r\n") + 1);
+
+        if (msg.compare(0, 4, "JOIN") == 0)
         {
-            createchannel(msg, Cfd);
+            std::string channel;
+            std::istringstream iss(msg);
+            std::string cmd;
+            iss >> cmd >> channel;
+
+            if (!channel.empty())
+            {
+                createchannel(channel, Cfd);
+            }
+            else
+            {
+                std::cout << "JOIN command missing channel name!" << std::endl;
+            }
         }
         else
         {
             std::cout << msg << std::endl;
         }
-    }
+}
+
 }
 
 
