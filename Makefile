@@ -1,27 +1,40 @@
-NAME = irc
+NAME = ircserv
+CNAME = Client
 RM = rm -rf
 CPP = c++
 CPPFlags = -Wextra -Wall -Werror -std=c++98
 
-SRC = Claint.cpp  main.cpp  Server.cpp \
+HDIR = headers
+SRCDIR = srcs
+CMD_DIR = cmds
 
-HDR = Claint.hpp  Server.hpp \
+HDR = $(HDIR)/Client.hpp  $(HDIR)/Server.hpp $(HDIR)/Channel.hpp \
+
+
+CSRC = $(SRCDIR)/RefClient.cpp \
+
+SRC = $(SRCDIR)/Client.cpp  $(SRCDIR)/main.cpp $(SRCDIR)/Server.cpp $(SRCDIR)/Channel.cpp \
+	$(CMD_DIR)/join.cpp $(CMD_DIR)/nick.cpp $(CMD_DIR)/pass.cpp $(CMD_DIR)/user.cpp \
 
 OSRC = $(SRC:.cpp=.o)
+COSRC = $(CSRC:.cpp=.o)
 
-all:$(NAME)
+all:$(NAME) $(CNAME)
 
 $(NAME): $(OSRC)
 	$(CPP) $(OSRC) -o $(NAME)
+
+$(CNAME): $(COSRC)
+	$(CPP) $(COSRC) -o $(CNAME)
 
 %.o:%.cpp
 	$(CPP) $(CPPFlags) -c $< -o $@
 
 clean:
-	$(RM) $(OSRC)
+	$(RM) $(OSRC) $(COSRC)
 
 fclean:
-	$(RM) $(OSRC) $(NAME)
+	$(RM) $(OSRC) $(COSRC)  $(NAME) $(CNAME)
 
 re: fclean all
 
