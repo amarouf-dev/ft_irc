@@ -6,9 +6,9 @@ int main ()
 {
     try
     {
-        int claintsock = socket(AF_INET, SOCK_STREAM, 0);
-        if (claintsock == -1)
-            throw (std::runtime_error("Claint's socket failed !"));
+        int clientsock = socket(AF_INET, SOCK_STREAM, 0);
+        if (clientsock == -1)
+            throw (std::runtime_error("Client's socket failed !"));
         
         sockaddr_in caddr;
         
@@ -18,8 +18,8 @@ int main ()
     
         socklen_t len = sizeof(caddr);
 
-        if (connect(claintsock, reinterpret_cast<sockaddr *>(&caddr), len) == -1)
-            throw (std::runtime_error("Claint's connect failed !"));
+        if (connect(clientsock, reinterpret_cast<sockaddr *>(&caddr), len) == -1)
+            throw (std::runtime_error("Client's connect failed !"));
 
         char buffer[BUFSIZE];
 
@@ -27,9 +27,9 @@ int main ()
         {
             std::memset(buffer, 0, sizeof(buffer));
             if (read(0, buffer, BUFSIZE) < 0)
-                throw (std::runtime_error("Claint's read failed !"));
+                throw (std::runtime_error("Client's read failed !"));
 
-            write(claintsock, buffer, BUFSIZE - 1);
+            write(clientsock, buffer, BUFSIZE - 1);
             
         }
     }

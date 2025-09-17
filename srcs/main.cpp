@@ -2,12 +2,20 @@
 
 #include "../headers/Server.hpp"
 
-int main ()
+int main (int ac, char **av)
 {
+    if (ac != 3)
+    {
+        std::cerr << "Usage: ./ircserv <port> <password>\n";
+        return 1;
+    }
+
+    int port = std::atoi(av[1]); 
+    std::string password = av[2];
+
     try
     {
-        Server s;
-
+        Server s(port, password);
         s.StartServer();
     }
     catch(const std::exception& e)
