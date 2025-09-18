@@ -20,14 +20,7 @@ void Server::handle_kick(Client &client, const std::vector<std::string> &args)
     }
     if (args.size() == 3)
     {
-        for (std::set<Client *>::iterator it = chnl->getMembers().begin(); it != chnl->getMembers().end(); it++)
-        {
-            if ((*it)->GetNick() == args[1])
-            {
-                c = *it;
-                break;
-            }
-        }
+        c = chnl->GetMemberByName(args[1]);
         if (c == NULL)
         {
             std::cout << RED << "The user (" << args[1] << ") was not found !" << WHITE << std::endl;

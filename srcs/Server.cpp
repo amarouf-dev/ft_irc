@@ -161,32 +161,6 @@ void Server::NewClient()
     std::cout << GREEN << "Client (" << nc.fd << ") Connected" << WHITE << std::endl;
 }
 
-// void Server::createchannel(std::string n, int fd)
-// {
-//     Channel ch(n);
-//     Client *c;
-
-//     for (unsigned long i = 0; i < clients.size(); i ++)
-//     {
-//         if (clients[i].GetFd() == fd)
-//         {
-//             c = &clients[i];
-//         }
-//     }
-
-//     for (unsigned long i = 0; i < channels.size(); i ++)
-//     {
-//         if (channels[i]->getName() == n)
-//         {
-//             channels[i]->join_channel(c);
-//             return ;
-//         }
-//     }
-//     ch.Initchannel(n, c);
-//     this->channels.push_back(&ch);
-// }
-
-
 void Server::NewData(int Cfd)
 {
     char buffer[1024];
@@ -220,7 +194,6 @@ void Server::NewData(int Cfd)
             break;
         }
     }
-    // if (!client) return;
 
     if (command == "PASS")
     {

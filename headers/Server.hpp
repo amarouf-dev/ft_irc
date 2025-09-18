@@ -42,7 +42,6 @@ class Server
         void NewClient();
         void NewData(int);
         void removeClient(int);
-        // void createchannel(std::string, int);
 
         //--------------------------handle commands
         void handle_pass(Client &client, const std::string &pass_arg);
