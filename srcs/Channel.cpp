@@ -51,5 +51,14 @@ Client* Channel::GetMemberByName(std::string name) const
 }
 
 
+const std::string Channel::GetTopic() const
+{
+    return (topic);
+}
+
+void Channel::SetTopic(std::string n)
+{
+    topic = n;
+}
 
 

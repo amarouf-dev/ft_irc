@@ -220,6 +220,13 @@ void Server::NewData(int Cfd)
         iss >> chan;
         handle_join(*client, chan);
     }
+    else if (command == "TOPIC")
+    {
+        std::vector<std::string> targs;
+        std::string targ;
+        while (iss >> targ) targs.push_back(targ);
+        handle_topic(*client, targs);
+    }
     else if (command == "INVITE")
     {
         std::vector<std::string> iargs;

@@ -49,7 +49,7 @@ class Server
         void handle_user(Client &client, const std::vector<std::string> &args);
         void handle_join(Client &client, const std::string &channel_name);
         void handle_kick(Client &client, const std::vector<std::string> &args);
-        void handle_topic(Client &client, const std::string &topic);
+        void handle_topic(Client &client, const std::vector<std::string> &args);
         void handle_invite(Client &client, const std::vector<std::string> &args);
 
         //--------------------------some helpers

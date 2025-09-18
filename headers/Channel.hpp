@@ -27,6 +27,9 @@ class Channel
     std::string getName() const;
     const std::set<Client*>& getMembers() const;
     Client* GetMemberByName(std::string name) const;
+
+    const std::string GetTopic() const;
+    void SetTopic(std::string);
 };
 
 #endif
