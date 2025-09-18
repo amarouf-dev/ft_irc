@@ -68,6 +68,17 @@ const std::set<Client*>&  Channel::getMembers() const
 	return (this->members);
 }
 
+const Client* Channel::GetMemberByName(std::string name) const
+{
+    for (std::set<Client*>::iterator it = members.begin(); it != members.end(); it ++)
+    {
+        if (name == (*it)->GetNick())
+        {
+            return (*it);
+        }
+    }
+    return (NULL);
+}
 
 
 

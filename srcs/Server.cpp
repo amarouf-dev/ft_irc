@@ -21,6 +21,19 @@ Client *Server::FindClaintByFd(int fd)
     return (NULL);
 }
 
+Client *Server::FindClaintByName(std::string name)
+{
+     for (unsigned long i = 0; i < clients.size(); i ++)
+    {
+        if (clients[i].GetNick() == name)
+        {
+            return (&clients[i]);
+        }
+    }
+    return (NULL);
+}
+
+
 
 void Server::StartServer()
 {
@@ -234,12 +247,13 @@ void Server::NewData(int Cfd)
         iss >> chan;
         handle_join(*client, chan);
     }
-    // else if (command == "TOPIC")
-    // {
-    //     std::string tpc;
-    //     iss >> tpc;
-    //     handle_topic(*client, tpc);
-    // }
+    else if (command == "INVITE")
+    {
+        std::vector<std::string> iargs;
+        std::string iarg;
+        while (iss >> iarg) iargs.push_back(iarg);
+        handle_invite(*client, iargs);
+    }
     else if (command == "KICK")
     {
         std::vector<std::string> Kargs;

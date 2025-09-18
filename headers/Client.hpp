@@ -56,7 +56,6 @@ class Client
 
         void SetCurChannel(Channel *);
         Channel *GetCurChannel() const;
-
 };
 
 #endif

@@ -28,6 +28,7 @@ class Channel
     // void add_op(Client*);
     std::string getName() const;
     const std::set<Client*>& getMembers() const;
+    const Client* GetMemberByName(std::string name) const;
 };
 
 // #ifndef CHANNEL_HPP
