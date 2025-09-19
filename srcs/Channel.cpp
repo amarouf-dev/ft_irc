@@ -28,9 +28,9 @@ std::string Channel::getName() const
 bool Channel::is_member(Client *client)
 {
 	if(members.find(client) != members.end())
-		return (false);
-	else
 		return (true);
+	else
+		return (false);
 }
 
 const std::set<Client*>&  Channel::getMembers() const
@@ -80,4 +80,10 @@ void Channel::broadcast(const std::string &msg)
         (*it)->sendmsg(msg);
     }
 }
+
+bool Channel::GetInviteonly(void) const
+{
+    return (inviteonly);
+}
+
 

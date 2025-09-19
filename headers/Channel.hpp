@@ -12,6 +12,9 @@ class Channel;
 class Channel
 {
     private:
+
+    bool inviteonly;
+
     std::string name;
     std::string topic;
 
@@ -28,6 +31,8 @@ class Channel
     const std::set<Client*>& getMembers() const;
     Client* GetMemberByName(std::string name) const;
     bool isoperator(std::string name) const;
+
+    bool GetInviteonly(void) const;
 
     const std::string GetTopic() const;
     void SetTopic(std::string);

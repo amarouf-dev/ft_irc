@@ -3,29 +3,56 @@
 
 void Server::handle_kick(Client &client, const std::vector<std::string> &args)
 {
-    Channel *chnl = client.GetCurChannel();
-    Client *c = NULL;
-
-    if (chnl == NULL)
+    if (args.size() < 2)
     {
-        std::cout << RED << "No channel was found!" << WHITE << std::endl;
-        return ;
-    }
-    
-    if (!client.IsAuthenticated())
-    {
-        std::string msg = "You must authenticate first!\r\n";
-        client.sendmsg(msg);
+        client.sendmsg(":ircserv 461 " + client.GetNick() + " KICK :Not enough parameters\r\n");
         return;
     }
-    if (args.size() == 3)
+
+    std::string ch_name = args[0];
+    std::string targetNick = args[1];
+    std::string reason = (args.size() > 2) ? args[2] : client.GetNick();
+
+    if (args.size() > 2)
     {
-        c = chnl->GetMemberByName(args[1]);
-        if (c == NULL)
-        {
-            std::cout << RED << "The user (" << args[1] << ") was not found !" << WHITE << std::endl;
-            return ;
-        }
-        chnl->removeClaint(c);
+        reason = args[2];
+        for (size_t i = 3; i < args.size(); i++)
+            reason += " " + args[i];
     }
+    else
+        reason = client.GetNick();
+
+    Channel *chnl = getChannel(ch_name);
+    if (!chnl)
+    {
+        client.sendmsg(":ircserv 403 " + client.GetNick() + " " + ch_name + " :No such channel\r\n");
+        return;
+    }
+
+    if (!chnl->is_member(&client))
+    {
+        client.sendmsg(":ircserv 442 " + client.GetNick() + " " + ch_name + " :You're not on that channel\r\n");
+        return;
+    }
+
+    if (!chnl->isoperator(client.GetNick()))
+    {
+        client.sendmsg(":ircserv 482 " + client.GetNick() + " " + ch_name + " :You're not channel operator\r\n");
+        return;
+    }
+
+    Client *target = chnl->GetMemberByName(targetNick);
+    if (!target)
+    {
+        client.sendmsg(":ircserv 441 " + client.GetNick() + " " + targetNick + " " + ch_name + " :They aren't on that channel\r\n");
+        return;
+    }
+
+    std::string kickMsg = ":" + client.GetNick() + "!" + client.GetUsername() +
+                          "@" + client.GetIp() + " KICK " + ch_name + " " +
+                          targetNick + " :" + reason + "\r\n";
+    chnl->broadcast(kickMsg);
+
+    chnl->removeClaint(target);
 }
+
