@@ -188,7 +188,7 @@ void Server::NewData(int Cfd)
     if (bytes <= 0)
     {
         std::cout << RED << "Client (" << Cfd << ") Disconnected !" << WHITE << std::endl;
-        // TODO: maybe remove client from lists
+        removeClient(Cfd);
         return;
     }
 
