@@ -30,7 +30,6 @@ int main ()
                 throw (std::runtime_error("Client's read failed !"));
 
             write(clientsock, buffer, BUFSIZE - 1);
-            
         }
     }
     catch(const std::exception& e)

@@ -65,3 +65,44 @@ std::string Client::GetRealname() const
     return realname; 
 }
 
+void Client::SetBuffer(const std::string& msg)
+{
+    this->outbuf += msg;
+}
+
+void Client::SetPfd(pollfd *npfd)
+{
+    this->pfd = npfd;
+}
+
+pollfd *Client::GetPfd(void) const
+{
+    return (this->pfd);
+}
+
+std::string& Client::GetBuffer()
+{
+    return outbuf;
+}
+
+const std::string& Client::GetBuffer() const
+{
+    return outbuf;
+}
+
+void Client::SetCurChannel(Channel *chnl)
+{
+    this->cur_chnl = chnl;
+}
+
+Channel *Client::GetCurChannel() const
+{
+    return (this->cur_chnl);
+}
+
+void Client::sendmsg(std::string msg)
+{
+    this->outbuf += msg;
+    this->pfd->events |= POLLOUT;
+}
+

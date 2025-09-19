@@ -1,13 +1,20 @@
 
-#include "Server.hpp"
-
 
 #ifndef CHNNNLL_
 #define CHNNNLL_
 
+#include "Server.hpp"
+#include "Client.hpp"
+
+class Client;
+class Channel;
+
 class Channel
 {
     private:
+
+    bool inviteonly;
+
     std::string name;
     std::string topic;
 
@@ -16,34 +23,21 @@ class Channel
 
     public:
     Channel(const std::string &chanName);
-    // void Initchannel(std::string, Client*);
-    // void join_channel(Client*);
+
     void addClient(Client *client);
-    void add_op(Client*);
+    void removeClaint(Client *client);
+    bool is_member(Client *client);
     std::string getName() const;
     const std::set<Client*>& getMembers() const;
+    Client* GetMemberByName(std::string name) const;
+    bool isoperator(std::string name) const;
+
+    bool GetInviteonly(void) const;
+
+    const std::string GetTopic() const;
+    void SetTopic(std::string);
+
+    void broadcast(const std::string &msg);
 };
-
-// #ifndef CHANNEL_HPP
-// #define CHANNEL_HPP
-
-// #include "Client.hpp"
-// #include <vector>
-// #include <string>
-
-// class Channel
-// {
-//     private:
-//         std::string name;
-//         std::vector<Client*> members;
-
-//     public:
-//         Channel(const std::string &chanName);
-
-//         std::string getName() const;
-//         const std::vector<Client*>& getMembers() const;
-
-//         // TODO: removeClient() 
-// };
 
 #endif

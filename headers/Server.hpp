@@ -24,6 +24,9 @@
 #define YELLO "\e[1;33m"
 #define BUFSIZE 1024
 
+class Client;
+class Channel;
+
 class Server
 {
     private:
@@ -39,13 +42,15 @@ class Server
         void NewClient();
         void NewData(int);
         void removeClient(int);
-        void createchannel(std::string, int);
 
         //--------------------------handle commands
         void handle_pass(Client &client, const std::string &pass_arg);
         void handle_nick(Client &client, const std::string &nick_arg);
         void handle_user(Client &client, const std::vector<std::string> &args);
         void handle_join(Client &client, const std::string &channel_name);
+        void handle_kick(Client &client, const std::vector<std::string> &args);
+        void handle_topic(Client &client, const std::vector<std::string> &args);
+        void handle_invite(Client &client, const std::vector<std::string> &args);
 
         //--------------------------some helpers
         bool isNickTaken(const std::string &nick);
@@ -54,6 +59,10 @@ class Server
         void welcomeClient(Client &client);
         Channel* getOrCreateChannel(const std::string &channel_name);
 
+        Channel* getChannel(const std::string &channel_name);
+
+        Client *FindClaintByFd(int fd);
+        Client *FindClaintByName(std::string name);
         // TODO: memory cleanup for channels
 
 
