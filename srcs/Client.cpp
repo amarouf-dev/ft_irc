@@ -80,9 +80,14 @@ pollfd *Client::GetPfd(void) const
     return (this->pfd);
 }
 
-std::string Client::GetBuffer(void) const
+std::string& Client::GetBuffer()
 {
-    return (outbuf);
+    return outbuf;
+}
+
+const std::string& Client::GetBuffer() const
+{
+    return outbuf;
 }
 
 void Client::SetCurChannel(Channel *chnl)
@@ -95,4 +100,9 @@ Channel *Client::GetCurChannel() const
     return (this->cur_chnl);
 }
 
+void Client::sendmsg(std::string msg)
+{
+    this->outbuf += msg;
+    this->pfd->events |= POLLOUT;
+}
 

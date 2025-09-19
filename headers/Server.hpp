@@ -59,6 +59,8 @@ class Server
         void welcomeClient(Client &client);
         Channel* getOrCreateChannel(const std::string &channel_name);
 
+        Channel* getChannel(const std::string &channel_name);
+
         Client *FindClaintByFd(int fd);
         Client *FindClaintByName(std::string name);
         // TODO: memory cleanup for channels

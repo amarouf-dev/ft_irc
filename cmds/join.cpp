@@ -9,9 +9,7 @@ void Server::handle_join(Client &client, const std::string &channel_name)
     if (!client.IsAuthenticated())
     {
         std::string msg = "You must authenticate first!\r\n";
-        // send(client.GetFd(), msg.c_str(), msg.size(), 0);
-        client.SetBuffer(msg);
-        client.GetPfd()->events |= POLLOUT;
+        client.sendmsg(msg);
         return;
     }
 
@@ -20,6 +18,7 @@ void Server::handle_join(Client &client, const std::string &channel_name)
     {
         std::string msg = "Invalid channel name. Must start with #\r\n";
         // send(client.GetFd(), msg.c_str(), msg.size(), 0);
+        client.sendmsg(msg);
         return;
     }
 
@@ -29,9 +28,7 @@ void Server::handle_join(Client &client, const std::string &channel_name)
     client.SetCurChannel(chan);
 
     std::string msg = ":" + client.GetNick() + " JOIN " + channel_name + "\r\n";
-    client.SetBuffer(msg);
-
-    client.GetPfd()->events |= POLLOUT;
+    client.sendmsg(msg);
 
     // //later
     // for (size_t i = 0; i < chan->getMembers().size(); i++)

@@ -27,9 +27,12 @@ class Channel
     std::string getName() const;
     const std::set<Client*>& getMembers() const;
     Client* GetMemberByName(std::string name) const;
+    bool isoperator(std::string name) const;
 
     const std::string GetTopic() const;
     void SetTopic(std::string);
+
+    void broadcast(const std::string &msg);
 };
 
 #endif

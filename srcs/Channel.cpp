@@ -61,4 +61,23 @@ void Channel::SetTopic(std::string n)
     topic = n;
 }
 
+bool Channel::isoperator(std::string name) const
+{
+    for (std::set<Client*>::iterator it = operators.begin(); it != operators.end(); it ++)
+    {
+        if (name == (*it)->GetNick())
+        {
+            return (true);
+        }
+    }
+    return (false);
+}
+
+void Channel::broadcast(const std::string &msg)
+{
+    for (std::set<Client*>::iterator it = members.begin(); it != members.end(); it++)
+    {
+        (*it)->sendmsg(msg);
+    }
+}
 

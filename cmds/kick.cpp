@@ -15,7 +15,7 @@ void Server::handle_kick(Client &client, const std::vector<std::string> &args)
     if (!client.IsAuthenticated())
     {
         std::string msg = "You must authenticate first!\r\n";
-        send(client.GetFd(), msg.c_str(), msg.size(), 0);
+        client.sendmsg(msg);
         return;
     }
     if (args.size() == 3)

@@ -25,6 +25,8 @@ class Client
 
         Channel *cur_chnl;
 
+
+
     public:
 
         Client();
@@ -49,13 +51,16 @@ class Client
         std::string GetRealname() const;
 
         void SetBuffer(const std::string&);
-        std::string GetBuffer(void) const;
+        std::string& GetBuffer();
+        const std::string& GetBuffer() const;
 
         void SetPfd(pollfd *pfd);
         pollfd *GetPfd(void) const;
 
         void SetCurChannel(Channel *);
         Channel *GetCurChannel() const;
+
+        void sendmsg(std::string);
 };
 
 #endif
