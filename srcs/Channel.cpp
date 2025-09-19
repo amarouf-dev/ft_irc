@@ -8,11 +8,10 @@ void Channel::addClient(Client *client)
 	if (members.find(client) != members.end())
 		return ;
     members.insert(client);
+    operators.insert(client);
     // TODO: notify everyone about join
     // TODO: make sure if check max members needed? 
 }
-
-
 
 void Channel::removeClaint(Client *client)
 {
