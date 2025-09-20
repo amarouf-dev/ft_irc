@@ -46,8 +46,6 @@ Client *Server::FindClaintByName(std::string name)
     return (NULL);
 }
 
-
-
 void Server::StartServer()
 {
     CreateSocket();
@@ -126,9 +124,7 @@ void Server::MainLoop()
                 if (poll_fds[i].fd == sockfd)
                     NewClient();
                 else
-                {
                     NewData(poll_fds[i].fd);
-                }
             }
             if (poll_fds[i].revents & POLLOUT)
             {
@@ -140,9 +136,7 @@ void Server::MainLoop()
                     {
                         c->GetBuffer().erase(0, n);
                         if (c->GetBuffer().empty())
-                        {
                             poll_fds[i].events &= ~POLLOUT;
-                        }
                     }
                 }
             }
@@ -170,11 +164,9 @@ void Server::NewClient()
     newC.SetFd(new_fd);
     newC.SetIp(inet_ntoa(cliaddr.sin_addr));
     newC.SetCurChannel(NULL);
-
     newC.SetPfd(&poll_fds.back());
 
     clients.push_back(newC);
-
     std::cout << GREEN << "Client (" << new_fd << ") Connected" << WHITE << std::endl;
 }
 
@@ -203,15 +195,7 @@ void Server::NewData(int Cfd)
     for (size_t i = 0; i < command.size(); i++)
         command[i] = toupper(command[i]);
 
-    Client* client = NULL;
-    for (size_t i = 0; i < clients.size(); i++)
-    {
-        if (clients[i].GetFd() == Cfd)
-        {
-            client = &clients[i];
-            break;
-        }
-    }
+    Client* client = FindClaintByFd(Cfd);
 
     if (command == "PASS")
     {
@@ -262,7 +246,7 @@ void Server::NewData(int Cfd)
     else
     {
         std::string rep = "Unknown command\r\n";
-        send(Cfd, rep.c_str(), rep.size(), 0);
+        client->sendmsg(rep);
     }
 }
 
