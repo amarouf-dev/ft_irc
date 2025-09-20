@@ -57,15 +57,15 @@ class Server
         bool isValidNickName(const std::string &nick);
         bool isValidUsername(const std::string &username);
         void welcomeClient(Client &client);
+    
+        //--------------------------Channel
         Channel* getOrCreateChannel(const std::string &channel_name);
-
         Channel* getChannel(const std::string &channel_name);
 
+        //--------------------------Client
         Client *FindClaintByFd(int fd);
         Client *FindClaintByName(std::string name);
         // TODO: memory cleanup for channels
-
-
     public:
         Server(int port, const std::string &password);
         void StartServer();

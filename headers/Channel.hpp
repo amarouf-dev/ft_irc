@@ -22,6 +22,7 @@ class Channel
     std::set<Client *> operators;
 
     public:
+
     Channel(const std::string &chanName);
 
     void addClient(Client *client);
@@ -31,9 +32,7 @@ class Channel
     const std::set<Client*>& getMembers() const;
     Client* GetMemberByName(std::string name) const;
     bool isoperator(std::string name) const;
-
     bool GetInviteonly(void) const;
-
     const std::string GetTopic() const;
     void SetTopic(std::string);
 
