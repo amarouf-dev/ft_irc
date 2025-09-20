@@ -8,11 +8,10 @@ void Channel::addClient(Client *client)
 	if (members.find(client) != members.end())
 		return ;
     members.insert(client);
+    operators.insert(client);
     // TODO: notify everyone about join
     // TODO: make sure if check max members needed? 
 }
-
-
 
 void Channel::removeClaint(Client *client)
 {
@@ -63,13 +62,8 @@ void Channel::SetTopic(std::string n)
 
 bool Channel::isoperator(std::string name) const
 {
-    for (std::set<Client*>::iterator it = operators.begin(); it != operators.end(); it ++)
-    {
-        if (name == (*it)->GetNick())
-        {
-            return (true);
-        }
-    }
+    if (GetMemberByName(name))
+        return (true);
     return (false);
 }
 
