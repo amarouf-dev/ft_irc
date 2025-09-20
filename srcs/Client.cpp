@@ -90,16 +90,6 @@ const std::string& Client::GetBuffer() const
     return outbuf;
 }
 
-void Client::SetCurChannel(Channel *chnl)
-{
-    this->cur_chnl = chnl;
-}
-
-Channel *Client::GetCurChannel() const
-{
-    return (this->cur_chnl);
-}
-
 void Client::sendmsg(std::string msg)
 {
     this->outbuf += msg;

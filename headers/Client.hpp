@@ -57,9 +57,7 @@ class Client
         void SetPfd(pollfd *pfd);
         pollfd *GetPfd(void) const;
 
-        void SetCurChannel(Channel *);
-        Channel *GetCurChannel() const;
-
+        // Use instead of send:
         void sendmsg(std::string);
 };
 
