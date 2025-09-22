@@ -1,4 +1,4 @@
-#include "../Server.hpp"
+#include "../includes/Server.hpp"
 
 bool Server::isValidUsername(const std::string &username)
 {

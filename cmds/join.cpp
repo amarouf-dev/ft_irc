@@ -1,4 +1,4 @@
-#include "../Server.hpp"
+#include "../includes/Server.hpp"
 
 
 void Server::handle_join(Client &client, const std::string &channel_name)

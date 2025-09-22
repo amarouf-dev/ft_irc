@@ -1,4 +1,4 @@
-#include "Server.hpp"
+#include "includes/Server.hpp"
   
 Server::Server(int port, const std::string &password)
 {
@@ -177,51 +177,5 @@ void Server::NewData(int Cfd)
     //     send(Cfd, rep.c_str(), rep.size(), 0);
     // }
 }
-
-
-
-
-// void Server::NewData(int Cfd)
-// {
-//     char buffer[1024];
-
-//     std::memset(buffer, 0, sizeof(buffer));
-
-//     if (recv(Cfd, buffer, 1023, 0) < 0)
-//     {
-//         std::cout << RED << "client (" << Cfd << ") Disconnected !" << std::endl;
-//     }
-//     else
-//     {
-//         std::cout << buffer;
-//     }
-
-//     //--------------------------------------
-//     std::string msg(buffer);
-//     msg.erase(msg.find_last_not_of("\r\n") + 1); // trim \r\n
-//     std::cout << "Received: " << msg;
-
-//     for (size_t i = 0; i < clients.size(); i++)
-//     {
-//         if (clients[i].GetFd() == Cfd)
-//         {
-//             if (msg.rfind("PASS ", 0) == 0)
-//                 handle_pass(clients[i], msg.substr(5));
-//             else if (msg.rfind("NICK ", 0) == 0)
-//                 handle_nick(clients[i], msg.substr(5));
-//             else if (msg.rfind("JOIN ", 0) == 0)
-//                 handle_join(clients[i], msg.substr(5));
-//             else if (args[0] == "USER")
-//                 handle_user(clients[i], args);
-//             else
-//             {
-//                 std::string rep = "Unknown command\r\n";
-//                 send(Cfd, rep.c_str(), rep.size(), 0);
-//             }
-//             break;
-//         }
-//     }
-
-// }
 
 
