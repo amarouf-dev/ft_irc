@@ -1,9 +1,4 @@
 #include "Server.hpp"
-
-// Server::Server()
-// {
-//     this->port = htons(4040);
-// }
   
 Server::Server(int port, const std::string &password)
 {
@@ -107,112 +102,82 @@ void Server::NewData(int Cfd)
         // TODO: maybe remove client from lists
         return;
     }
-
-    std::string input(buffer);
-    std::cout << "Received: " << input << std::endl;  // debug
-
-    // tokenize inpt
-    std::istringstream iss(input);
-    std::string command;
-    iss >> command;
-
-    for (size_t i = 0; i < command.size(); i++)
-        command[i] = toupper(command[i]);
-
-    Client* client = NULL;
-    for (size_t i = 0; i < clients.size(); i++)
-    {
-        if (clients[i].GetFd() == Cfd)
-        {
-            client = &clients[i];
-            break;
-        }
-    }
-    // if (!client) return;
-
-    if (command == "PASS")
-    {
-        std::string pass_arg;
-        iss >> pass_arg;
-        handle_pass(*client, pass_arg);
-    }
-    else if (command == "NICK")
-    {
-        std::string nick_arg;
-        iss >> nick_arg;
-        handle_nick(*client, nick_arg);
-    }
-    else if (command == "USER")
-    {
-        std::vector<std::string> args;
-        std::string arg;
-        while (iss >> arg) args.push_back(arg);
-        handle_user(*client, args);
-    }
-    else if (command == "JOIN")
-    {
-        std::string chan;
-        iss >> chan;
-        handle_join(*client, chan);
-    }
     else
     {
-        std::string rep = "Unknown command\r\n";
-        send(Cfd, rep.c_str(), rep.size(), 0);
+        buffer[bytes] = '\0';
+        for (size_t i = 0; i < clients.size(); i++)
+        {
+            if (clients[i].GetFd() == Cfd)
+            {
+                std::string &buff = clients[i].GetClientBuffer();
+                buff += buffer;
+                size_t pos;
+                while ((pos = buff.find("\r\n")) != std::string::npos)
+                {
+                    std::string cmd = buff.substr(0, pos); //Extract one command 
+                    buff.erase(0, pos + 2);                 //remove \r\n from the buff
+                    std::cout << "Received command: " << cmd << std::endl;
+                    executeCmd(clients[i], cmd);
+                }
+                break;
+            }
+        }
     }
+
+    // std::string input(buffer);
+    // std::cout << "Received: " << input << std::endl;
+
+    // // tokenize inpt
+    // std::istringstream iss(input);
+    // std::string command;
+    // iss >> command;
+
+    // for (size_t i = 0; i < command.size(); i++)
+    //     command[i] = toupper(command[i]);
+
+    // Client* client = NULL;
+    // for (size_t i = 0; i < clients.size(); i++)
+    // {
+    //     if (clients[i].GetFd() == Cfd)
+    //     {
+    //         client = &clients[i];
+    //         break;
+    //     }
+    // }
+    // // if (!client) return;
+
+    // if (command == "PASS")
+    // {
+    //     std::string pass_arg;
+    //     iss >> pass_arg;
+    //     handle_pass(*client, pass_arg);
+    // }
+    // else if (command == "NICK")
+    // {
+    //     std::string nick_arg;
+    //     iss >> nick_arg;
+    //     handle_nick(*client, nick_arg);
+    // }
+    // else if (command == "USER")
+    // {
+    //     std::vector<std::string> args;
+    //     std::string arg;
+    //     while (iss >> arg) args.push_back(arg);
+    //     handle_user(*client, args);
+    // }
+    // else if (command == "JOIN")
+    // {
+    //     std::string chan;
+    //     iss >> chan;
+    //     handle_join(*client, chan);
+    // }
+    // else
+    // {
+    //     std::string rep = "Unknown command\r\n";
+    //     send(Cfd, rep.c_str(), rep.size(), 0);
+    // }
 }
 
-
-// void Server::NewData(int Cfd)
-// {
-//     char buffer[1024];
-//     std::memset(buffer, 0, sizeof(buffer));
-
-//     int bytes = recv(Cfd, buffer, 1023, 0);
-//     if (bytes <= 0)
-//     {
-//         std::cout << RED << "client (" << Cfd << ") Disconnected !" << std::endl;
-//         return;
-//     }
-
-//     //--------------------------------------
-//     std::string msg(buffer);
-//     msg.erase(msg.find_last_not_of("\r\n") + 1);
-
-//     // Split into args
-//     std::stringstream ss(msg);
-//     std::vector<std::string> args;
-//     std::string word;
-//     while (ss >> word) args.push_back(word);
-
-//     for (size_t i = 0; i < clients.size(); i++)
-//     {
-//         if (clients[i].GetFd() == Cfd)
-//         {
-//             if (args.empty())
-//                 break; 
-
-//             std::string command = args[0];
-//             std::string param = ""; 
-//             if (args.size() > 1)
-//                 param = args[1]; 
-//             if (command == "PASS")
-//                 handle_pass(clients[i], param);
-//             else if (command == "NICK")
-//                 handle_nick(clients[i], param);
-//             else if (command == "USER")
-//                 handle_user(clients[i], args); //USER needs all args
-//             else if (command == "JOIN")
-//                 handle_join(clients[i], param);
-//             else
-//             {
-//                 std::string rep = "Unknown command\r\n";
-//                 send(Cfd, rep.c_str(), rep.size(), 0);
-//             }
-//             break;
-//         }
-//     }
-// }
 
 
 

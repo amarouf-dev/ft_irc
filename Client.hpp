@@ -12,6 +12,8 @@ class Client
         std::string nickname;
         std::string username;
         std::string realname;
+        std::string buffer;
+
 
     public:
 
@@ -28,13 +30,16 @@ class Client
         void Authenticate();
 
         void SetNick(const std::string &nick);
-        std::string GetNick() const;
-
         void SetUsername(const std::string &user);
-        std::string GetUsername() const;
-
         void SetRealname(const std::string &real);
+        void SetClientBuffer(std::string buffer);
+
+        
+        std::string GetUsername() const;
+        std::string GetNick() const;
         std::string GetRealname() const;
+        std::string &GetClientBuffer();
+
 
 };
 

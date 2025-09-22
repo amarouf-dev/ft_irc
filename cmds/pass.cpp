@@ -1,31 +1,29 @@
 #include "../Server.hpp"
 
-void Server::handle_pass(Client &client, const std::string &pass_arg)
+void Server::handle_pass(Client &client, const std::vector<std::string> &args)
 {
     if (client.IsAuthenticated())
     {
-        std::string rep = "You are already authenticated\r\n";
-        send(client.GetFd(), rep.c_str(), rep.size(), 0);
+        sendToClient(client.GetFd(), "You are already authenticated\r\n");
         return;
     }
 
-    if (pass_arg.empty())
+    if (args.size() < 2 || args[1].empty())
     {
-        std::string rep = "PASS: Not enough parameters\r\n";
-        send(client.GetFd(), rep.c_str(), rep.size(), 0);
+        sendToClient(client.GetFd(), "PASS: Not enough parameters\r\n");
         return;
     }
+
+    const std::string &pass_arg = args[1];
 
     if (pass_arg == password)
     {
         client.Authenticate();
-        std::string rep = "Password accepted, you are authenticated!\r\n";
-        send(client.GetFd(), rep.c_str(), rep.size(), 0);
+        sendToClient(client.GetFd(), "Password accepted, you are authenticated!\r\n");
         std::cout << GREEN << "Client (" << client.GetFd() << ") authenticated successfully" << WHITE << std::endl;
     }
     else
     {
-        std::string rep = "Password incorrect\r\n";
-        send(client.GetFd(), rep.c_str(), rep.size(), 0);
+        sendToClient(client.GetFd(), "Password incorrect\r\n");
     }
 }

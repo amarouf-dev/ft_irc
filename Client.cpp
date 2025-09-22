@@ -4,63 +4,45 @@
 
 Client::Client() : authenticated(false) {}
 
-int Client::GetFd()
-{
-    return (fd);
+//--------------Setters
+void Client::SetFd(int n) 
+{ 
+    fd = n; 
 }
-
-void Client::SetFd(int n)
+void Client::SetIp(std::string n) 
 {
-    fd = n;
+    ip_addres = n; 
 }
-
-std::string Client::GetIp()
-{
-    return (ip_addres);
-}
-
-void Client::SetIp(std::string n)
-{
-    ip_addres = n;
-}
-
-//------------------------------
-bool Client::IsAuthenticated()
-{
-    return authenticated;
-}
-
-void Client::Authenticate()
-{
-    authenticated = true;
-}
-
-void Client::SetNick(const std::string &nick)
+void Client::SetNick(const std::string &nick) 
 { 
     nickname = nick; 
 }
-
-std::string Client::GetNick() const 
-{ 
-    return nickname; 
-}
-
 void Client::SetUsername(const std::string &user) 
 { 
     username = user; 
 }
-
-std::string Client::GetUsername() const 
-{ 
-    return username; 
-}
-
 void Client::SetRealname(const std::string &real) 
 { 
     realname = real; 
 }
-
-std::string Client::GetRealname() const 
+void Client::SetClientBuffer(std::string buffer) 
 { 
-    return realname; 
+    buffer = buffer; 
 }
+
+//--------------Getters
+int         Client::GetFd() { return (fd); }
+std::string Client::GetIp() { return (ip_addres); }
+std::string Client::GetNick() const { return nickname; }
+std::string Client::GetUsername() const { return username; }
+std::string Client::GetRealname() const { return realname; }
+std::string &Client::GetClientBuffer() { return buffer; }
+
+
+//------------------------------
+bool Client::IsAuthenticated() { return authenticated; }
+void Client::Authenticate() { authenticated = true; }
+
+
+
+

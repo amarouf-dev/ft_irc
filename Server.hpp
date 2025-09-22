@@ -38,8 +38,8 @@ class Server
         void NewData(int);
 
         //--------------------------handle commands
-        void handle_pass(Client &client, const std::string &pass_arg);
-        void handle_nick(Client &client, const std::string &nick_arg);
+        void handle_pass(Client &client, const std::vector<std::string> &args);
+        void handle_nick(Client &client, const std::vector<std::string> &args);
         void handle_user(Client &client, const std::vector<std::string> &args);
         void handle_join(Client &client, const std::string &channel_name);
 
@@ -56,6 +56,12 @@ class Server
     public:
         Server(int port, const std::string &password);
         void StartServer();
+        void executeCmd(Client& client, const std::string& cmd);
+        std::vector<std::string> get_arg(std::string cmd);
+        std::string trim(const std::string& str);
+        std::string &cmdToUppercase(std::string &str);
+        void sendToClient(int clientFd, const std::string& message) ;
+
 };
 
 #endif

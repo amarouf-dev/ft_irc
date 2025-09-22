@@ -25,8 +25,8 @@ void Server::handle_join(Client &client, const std::string &channel_name)
 
     chan->addClient(&client);
 
-    std::string msg = ":" + client.GetNick() + " JOIN " + channel_name + "\r\n";
-    send(client.GetFd(), msg.c_str(), msg.size(), 0);
+    // std::string msg = ":" + client.GetNick() + " JOIN " + channel_name + "\r\n";
+    // send(client.GetFd(), msg.c_str(), msg.size(), 0);
 
     // //later
     // for (size_t i = 0; i < chan->getMembers().size(); i++)

@@ -5,6 +5,7 @@ CPPFlags = -Wextra -Wall -Werror -std=c++98
 
 SRC = 	Client.cpp  main.cpp  Server.cpp Channel.cpp \
 		cmds/pass.cpp cmds/nick.cpp cmds/user.cpp cmds/join.cpp\
+		Server_helpers.cpp \
 
 HDR = Client.hpp  Server.hpp Channel.hpp\
 
