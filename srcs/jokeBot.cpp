@@ -31,6 +31,7 @@ int main() {
         if (connect(bot, (sockaddr*)&caddr, sizeof(caddr)) == -1)
             throw std::runtime_error("Bot connect failed!");
 
+        write(bot, "PASS 0000\r\n", 11);
         write(bot, "NICK jokebot\r\n", 14);
         write(bot, "USER jokebot 0 * :Joke Bot\r\n", 28);
         write(bot, "JOIN #school\r\n", 14);
@@ -51,7 +52,8 @@ int main() {
             }
         }
     }
-    catch(const std::exception &e) {
+    catch(const std::exception &e)
+	{
         std::cerr << e.what() << std::endl;
     }
 }
