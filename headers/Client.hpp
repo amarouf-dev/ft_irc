@@ -23,10 +23,6 @@ class Client
         std::string outbuf;
         pollfd *pfd;
 
-        Channel *cur_chnl;
-
-
-
     public:
 
         Client();

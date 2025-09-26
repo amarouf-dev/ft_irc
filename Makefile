@@ -1,5 +1,5 @@
 NAME = ircserv
-CNAME = Client
+CNAME = jokeBot
 RM = rm -rf
 CPP = c++
 CPPFlags = -Wextra -Wall -Werror -std=c++98
@@ -11,7 +11,7 @@ CMD_DIR = cmds
 HDR = $(HDIR)/Client.hpp  $(HDIR)/Server.hpp $(HDIR)/Channel.hpp \
 
 
-CSRC = $(SRCDIR)/RefClient.cpp \
+CSRC = $(SRCDIR)/jokeBot.cpp \
 
 SRC = $(SRCDIR)/Client.cpp  $(SRCDIR)/main.cpp $(SRCDIR)/Server.cpp $(SRCDIR)/Channel.cpp \
 	$(CMD_DIR)/join.cpp $(CMD_DIR)/nick.cpp $(CMD_DIR)/pass.cpp $(CMD_DIR)/user.cpp $(CMD_DIR)/kick.cpp $(CMD_DIR)/invite.cpp $(CMD_DIR)/topic.cpp \

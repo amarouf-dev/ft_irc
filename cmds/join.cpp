@@ -25,7 +25,6 @@ void Server::handle_join(Client &client, const std::string &channel_name)
     Channel* chan = getOrCreateChannel(channel_name);
 
     chan->addClient(&client);
-    client.SetCurChannel(chan);
 
     std::string msg = ":" + client.GetNick() + " JOIN " + channel_name + "\r\n";
     client.sendmsg(msg);

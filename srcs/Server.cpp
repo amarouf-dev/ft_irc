@@ -163,7 +163,6 @@ void Server::NewClient()
     Client newC;
     newC.SetFd(new_fd);
     newC.SetIp(inet_ntoa(cliaddr.sin_addr));
-    newC.SetCurChannel(NULL);
     newC.SetPfd(&poll_fds.back());
 
     clients.push_back(newC);
