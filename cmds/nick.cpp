@@ -1,6 +1,5 @@
 #include "../headers/Server.hpp"
 
-
 bool Server::isNickTaken(const std::string &nick)
 {
     for (size_t i = 0; i < clients.size(); i++)
@@ -24,33 +23,30 @@ bool Server::isValidNickName(const std::string &str)
     return true;
 }
 
-void Server::handle_nick(Client &client, const std::string &nick_arg)
+void Server::handle_nick(Client &client, const std::vector<std::string> &args)
 {
     if (!client.IsAuthenticated())
     {
-        std::string rep = "You must authenticate first with PASS\r\n";
-        send(client.GetFd(), rep.c_str(), rep.size(), 0);
+        sendToClient(client.GetFd(), "You must authenticate first with PASS\r\n");
         return;
     }
 
-    if (nick_arg.empty())
+    if (args.size() < 2 || args[1].empty())
     {
-        std::string rep = "No nickname given\r\n";
-        send(client.GetFd(), rep.c_str(), rep.size(), 0);
+        sendToClient(client.GetFd(), "No nickname given\r\n");
         return;
     }
 
+    const std::string &nick_arg = args[1];
     if (isNickTaken(nick_arg))
     {
-        std::string rep = "Nickname is already in use\r\n";
-        send(client.GetFd(), rep.c_str(), rep.size(), 0);
+        sendToClient(client.GetFd(), "Nickname is already in use\r\n");
         return;
     }
 
     if (!isValidNickName(nick_arg))
     {
-        std::string rep = "Not allowed chars for a nickname\r\n";
-        send(client.GetFd(), rep.c_str(), rep.size(), 0);
+        sendToClient(client.GetFd(), "Not allowed chars for a nickname\r\n");
         return;
     }
 
@@ -62,13 +58,13 @@ void Server::handle_nick(Client &client, const std::string &nick_arg)
         std::string msg = ":" + oldNick + " NICK :" + nick_arg + "\r\n";
         for (size_t i = 0; i < clients.size(); i++)
         {
-    
-            
             if (clients[i].GetFd() != client.GetFd())
-                send(clients[i].GetFd(), msg.c_str(), msg.size(), 0);
+                sendToClient(clients[i].GetFd(), msg);
         }
     }
 
-    std::string rep = "Nickname set to " + nick_arg + "\r\n";
-    send(client.GetFd(), rep.c_str(), rep.size(), 0);
+    sendToClient(client.GetFd(), "Nickname set to " + nick_arg + "\r\n");
+
+    if (!client.GetNick().empty() && !client.GetUsername().empty() && !client.GetRealname().empty())
+        welcomeClient(client);
 }

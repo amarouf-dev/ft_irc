@@ -163,7 +163,7 @@ void Server::NewClient()
     Client newC;
     newC.SetFd(new_fd);
     newC.SetIp(inet_ntoa(cliaddr.sin_addr));
-    newC.SetCurChannel(NULL);
+    // newC.SetCurChannel(NULL);
     newC.SetPfd(&poll_fds.back());
 
     clients.push_back(newC);
@@ -183,70 +183,126 @@ void Server::NewData(int Cfd)
         removeClient(Cfd);
         return;
     }
-
-    std::string input(buffer);
-    std::cout << "Received: " << input << std::endl;  // debug
-
-    // tokenize inpt
-    std::istringstream iss(input);
-    std::string command;
-    iss >> command;
-
-    for (size_t i = 0; i < command.size(); i++)
-        command[i] = toupper(command[i]);
-
-    Client* client = FindClaintByFd(Cfd);
-
-    if (command == "PASS")
-    {
-        std::string pass_arg;
-        iss >> pass_arg;
-        handle_pass(*client, pass_arg);
-    }
-    else if (command == "NICK")
-    {
-        std::string nick_arg;
-        iss >> nick_arg;
-        handle_nick(*client, nick_arg);
-    }
-    else if (command == "USER")
-    {
-        std::vector<std::string> args;
-        std::string arg;
-        while (iss >> arg) args.push_back(arg);
-        handle_user(*client, args);
-    }
-    else if (command == "JOIN")
-    {
-        std::string chan;
-        iss >> chan;
-        handle_join(*client, chan);
-    }
-    else if (command == "TOPIC")
-    {
-        std::vector<std::string> targs;
-        std::string targ;
-        while (iss >> targ) targs.push_back(targ);
-        handle_topic(*client, targs);
-    }
-    else if (command == "INVITE")
-    {
-        std::vector<std::string> iargs;
-        std::string iarg;
-        while (iss >> iarg) iargs.push_back(iarg);
-        handle_invite(*client, iargs);
-    }
-    else if (command == "KICK")
-    {
-        std::vector<std::string> Kargs;
-        std::string Karg;
-        while (iss >> Karg) Kargs.push_back(Karg);
-        handle_kick(*client, Kargs);
-    }
     else
     {
-        std::string rep = "Unknown command\r\n";
-        client->sendmsg(rep);
+        buffer[bytes] = '\0';
+        for (size_t i = 0; i < clients.size(); i++)
+        {
+            if (clients[i].GetFd() == Cfd)
+            {
+                std::string &buff = clients[i].GetClientBuffer();
+                buff += buffer;
+                size_t pos;
+                while ((pos = buff.find("\r\n")) != std::string::npos)
+                {
+                    std::string cmd = buff.substr(0, pos); //eextract one command 
+                    buff.erase(0, pos + 2);                 
+                    std::cout << "Received command: " << cmd << std::endl;
+                    executeCmd(clients[i], cmd);
+                }
+                break;
+            }
+        }
     }
+
 }
 
+
+
+
+
+
+
+// void Server::NewData(int Cfd)
+// {
+//     char buffer[1024];
+//     // std::memset(buffer, 0, sizeof(buffer));
+
+//     int bytes = recv(Cfd, buffer, 1023, 0);
+//     if (bytes <= 0)
+//     {
+//         std::cout << RED << "Client (" << Cfd << ") Disconnected !" << WHITE << std::endl;
+//         removeClient(Cfd);
+//         return;
+//     }
+
+//     // std::string input(buffer);
+//     // std::cout << "Received: " << input << std::endl;  // debug
+
+//     // tokenize inpt
+//     // std::istringstream iss(input);
+//     // std::string command;
+//     // iss >> command;
+
+//     // for (size_t i = 0; i < command.size(); i++)
+//     //     command[i] = toupper(command[i]);
+
+//     // Client* client = FindClaintByFd(Cfd);
+
+//     buffer[bytes] = '\0';
+//     Client* c = FindClaintByFd(Cfd);
+//     if (!c) 
+//         return;
+
+//     c->GetClientBuffer() += buf;
+
+//     size_t pos;
+//     while ((pos = c->GetClientBuffer().find("\r\n")) != std::string::npos)
+//     {
+//         std::string cmd = c->GetClientBuffer().substr(0, pos);
+//         c->GetClientBuffer().erase(0, pos + 2);
+//         executeCmd(*c, cmd);
+//     }
+
+//     // if (command == "PASS")
+//     // {
+//     //     std::string pass_arg;
+//     //     iss >> pass_arg;
+//     //     handle_pass(*client, pass_arg);
+//     // }
+//     // else if (command == "NICK")
+//     // {
+//     //     std::string nick_arg;
+//     //     iss >> nick_arg;
+//     //     handle_nick(*client, nick_arg);
+//     // }
+//     // else if (command == "USER")
+//     // {
+//     //     std::vector<std::string> args;
+//     //     std::string arg;
+//     //     while (iss >> arg) args.push_back(arg);
+//     //     handle_user(*client, args);
+//     // }
+//     // else if (command == "JOIN")
+//     // {
+//     //     std::string chan;
+//     //     iss >> chan;
+//     //     handle_join(*client, chan);
+//     // }
+//     // else if (command == "TOPIC")
+//     // {
+//     //     std::vector<std::string> targs;
+//     //     std::string targ;
+//     //     while (iss >> targ) targs.push_back(targ);
+//     //     handle_topic(*client, targs);
+//     // }
+//     // else if (command == "INVITE")
+//     // {
+//     //     std::vector<std::string> iargs;
+//     //     std::string iarg;
+//     //     while (iss >> iarg) iargs.push_back(iarg);
+//     //     handle_invite(*client, iargs);
+//     // }
+//     // else if (command == "KICK")
+//     // {
+//     //     std::vector<std::string> Kargs;
+//     //     std::string Karg;
+//     //     while (iss >> Karg) Kargs.push_back(Karg);
+//     //     handle_kick(*client, Kargs);
+//     // }
+//     // else
+//     // {
+//     //     std::string rep = "Unknown command\r\n";
+//     //     client->sendmsg(rep);
+//     // }
+// }

@@ -1,5 +1,3 @@
-
-
 #ifndef ClientTT
 #define ClientTT
 
@@ -19,43 +17,40 @@ class Client
         std::string nickname;
         std::string username;
         std::string realname;
+        std::string buffer;
 
         std::string outbuf;
         pollfd *pfd;
 
         Channel *cur_chnl;
 
-
-
     public:
 
         Client();
 
-        int GetFd();
+        int GetFd() const;
+        std::string GetIp() const;
+        std::string GetNick() const;
+        std::string GetUsername() const;
+        std::string GetRealname() const;
+        std::string &GetClientBuffer();
+        std::string& GetBuffer();
+        pollfd *GetPfd(void) const;
+
         void SetFd(int);
-
-        std::string GetIp();
         void SetIp(std::string);
+        void SetNick(const std::string &nick);
+        void SetUsername(const std::string &user);
+        void SetRealname(const std::string &real);
+        void SetClientBuffer(const std::string &buf);
+        void SetBuffer(const std::string&);
+        void SetPfd(pollfd *pfd);
 
+        
         //--------------------------
-        bool IsAuthenticated();
+        bool IsAuthenticated() const;
         void Authenticate();
 
-        void SetNick(const std::string &nick);
-        std::string GetNick() const;
-
-        void SetUsername(const std::string &user);
-        std::string GetUsername() const;
-
-        void SetRealname(const std::string &real);
-        std::string GetRealname() const;
-
-        void SetBuffer(const std::string&);
-        std::string& GetBuffer();
-        const std::string& GetBuffer() const;
-
-        void SetPfd(pollfd *pfd);
-        pollfd *GetPfd(void) const;
 
         // Use instead of send:
         void sendmsg(std::string);

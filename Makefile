@@ -8,15 +8,16 @@ HDIR = headers
 SRCDIR = srcs
 CMD_DIR = cmds
 
-HDR = $(HDIR)/Client.hpp  $(HDIR)/Server.hpp $(HDIR)/Channel.hpp \
+HDR = 	$(HDIR)/Client.hpp  $(HDIR)/Server.hpp $(HDIR)/Channel.hpp \
 
 
-CSRC = $(SRCDIR)/RefClient.cpp \
+CSRC =	$(SRCDIR)/RefClient.cpp \
 
-SRC = $(SRCDIR)/Client.cpp  $(SRCDIR)/main.cpp $(SRCDIR)/Server.cpp $(SRCDIR)/Channel.cpp \
-	$(CMD_DIR)/join.cpp $(CMD_DIR)/nick.cpp $(CMD_DIR)/pass.cpp $(CMD_DIR)/user.cpp $(CMD_DIR)/kick.cpp $(CMD_DIR)/invite.cpp $(CMD_DIR)/topic.cpp \
+SRC =	$(SRCDIR)/main.cpp $(SRCDIR)/Client.cpp $(SRCDIR)/Server.cpp $(SRCDIR)/Channel.cpp $(SRCDIR)/ServerTools.cpp\
+	  	$(CMD_DIR)/join.cpp $(CMD_DIR)/nick.cpp $(CMD_DIR)/pass.cpp $(CMD_DIR)/user.cpp $(CMD_DIR)/privmsg.cpp \
+	  	$(CMD_DIR)/kick.cpp $(CMD_DIR)/invite.cpp $(CMD_DIR)/topic.cpp $(CMD_DIR)/mode.cpp\
 
-OSRC = $(SRC:.cpp=.o)
+OSRC = 	$(SRC:.cpp=.o)
 COSRC = $(CSRC:.cpp=.o)
 
 all:$(NAME) $(CNAME)
