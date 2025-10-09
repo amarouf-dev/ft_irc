@@ -35,3 +35,5 @@ void Client::sendmsg(std::string msg)
 //------------------------------
 bool Client::IsAuthenticated() const { return authenticated; }
 void Client::Authenticate() { authenticated = true; }
+
+

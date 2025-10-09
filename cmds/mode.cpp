@@ -18,8 +18,8 @@ int Server::handle_mode_k(Client &client, Channel* chan, std::vector<std::string
     {
         if (index >= args.size()) 
         {
-            sendToClient(client.GetFd(), ":ircserv 461 " + client.GetNick() 
-            + " MODE " + chan->getName() + " :Key required for +k mode\r\n");
+            client.sendmsg(":ircserv 461 " + client.GetNick() + " MODE " 
+                    + chan->getName() + " :Key required for +k mode\r\n");
             return 0;
         }
         chan->set_key(args[index++], true);
@@ -35,14 +35,14 @@ int Server::handle_mode_l(Client &client, Channel* chan, std::vector<std::string
     {
         if (index >= args.size()) 
         {
-            sendToClient(client.GetFd(), ":ircserv 461 " + client.GetNick() 
+            client.sendmsg(":ircserv 461 " + client.GetNick() 
             + " MODE " + chan->getName() + " :Limit required for +l mode\r\n");
             return 0;
         }
         int limit = std::atoi(args[index++].c_str());
         if (limit <= 0) 
         {
-            sendToClient(client.GetFd(), ":ircserv 461 " + client.GetNick() 
+            client.sendmsg(":ircserv 461 " + client.GetNick() 
             + " MODE " + chan->getName() + " :Invalid limit\r\n");
             return 0;
         }
@@ -56,7 +56,7 @@ int Server::handle_mode_l(Client &client, Channel* chan, std::vector<std::string
 int Server::handle_mode_o(Client &client, Channel* chan, std::vector<std::string>& args, bool add, size_t &index) 
 {
     if (index >= args.size()) {
-        sendToClient(client.GetFd(), ":ircserv 461 " + client.GetNick() 
+        client.sendmsg(":ircserv 461 " + client.GetNick() 
         + " MODE " + chan->getName() + " :Nickname required for +o/-o\r\n");
         return 0;
     }
@@ -64,7 +64,7 @@ int Server::handle_mode_o(Client &client, Channel* chan, std::vector<std::string
     std::string nick = args[index++];
     Client* target = FindClaintByName(nick);
     if (!target || !chan->is_client_in_channel(target)) {
-        sendToClient(client.GetFd(), ":ircserv 441 " + client.GetNick() + " " 
+        client.sendmsg(":ircserv 441 " + client.GetNick() + " " 
         + nick + " " + chan->getName() + " :They aren't on that channel\r\n");
         return 0;
     }
@@ -74,7 +74,7 @@ int Server::handle_mode_o(Client &client, Channel* chan, std::vector<std::string
     else if (!add && chan->is_operator_in_channel(target))
         chan->remove_operator(target);
     else {
-        sendToClient(client.GetFd(), ":ircserv 482 " + client.GetNick() + " " 
+        client.sendmsg(":ircserv 482 " + client.GetNick() + " " 
         + chan->getName() + " :User is not a channel operator\r\n");
         return 0;
     }
@@ -92,8 +92,9 @@ void Server::notify_channel_mode_change(Client &client, Channel* chan,
     notif += "\r\n";
 
     const std::set<Client*>& mem = chan->getMembers();
-    for (std::set<Client*>::const_iterator it = mem.begin(); it != mem.end(); ++it) {
-        sendToClient((*it)->GetFd(), notif);
+    for (std::set<Client*>::const_iterator it = mem.begin(); it != mem.end(); ++it) 
+    {
+        (*it)->sendmsg(notif);
     }
 }
 
@@ -143,8 +144,7 @@ void Server::apply_channel_mode_flags(Client &client, Channel* chan, std::vector
         }
         else 
         {
-            sendToClient(client.GetFd(),
-                ":" + serverName + " 472 " + client.GetNick() +
+            client.sendmsg(":" + serverName + " 472 " + client.GetNick() +
                 " " + std::string(1, flag) + " :is unknown mode char to me\r\n");
             continue;
         }
@@ -160,14 +160,14 @@ void Server::handle_mode(Client &client, std::vector<std::string>& args)
 {
     if (args.size() < 2) 
     {
-        sendToClient(client.GetFd(), ":ircserv 461 " + client.GetNick()
+        client.sendmsg(":ircserv 461 " + client.GetNick()
             + " MODE :Not enough parameters\r\n");
         return;
     }
 
     std::string name = args[1];
     if (name.empty() || (name[0] != '#' && name[0] != '&')) {
-        sendToClient(client.GetFd(), ":ircserv 403 " + client.GetNick()
+        client.sendmsg(":ircserv 403 " + client.GetNick()
             + " " + name + " :No such channel\r\n");
         return;
     }
@@ -175,21 +175,21 @@ void Server::handle_mode(Client &client, std::vector<std::string>& args)
     Channel* chan = getChannel(name);
     if (!chan) 
     {
-        sendToClient(client.GetFd(), ":ircserv 403 " + client.GetNick()
+        client.sendmsg(":ircserv 403 " + client.GetNick()
             + " " + name + " :No such channel\r\n");
         return;
     }
 
     if (!chan->is_client_in_channel(&client)) 
     {
-        sendToClient(client.GetFd(), ":ircserv 442 " + client.GetNick()
+        client.sendmsg(":ircserv 442 " + client.GetNick()
             + " " + name + " :You're not on that channel\r\n");
         return;
     }
 
     if (!chan->is_operator_in_channel(&client)) 
     {
-        sendToClient(client.GetFd(), ":ircserv 482 " + client.GetNick()
+        client.sendmsg(":ircserv 482 " + client.GetNick()
             + " " + name + " :You're not channel operator\r\n");
         return;
     }

@@ -1,16 +1,16 @@
 #include "../headers/Server.hpp"
 
 
-void Server::sendToClient(int cFd, const std::string& message) 
-{
-    if (cFd == -1)
-        return;
-    std::string msg = message;
-    if (msg.substr(msg.size() - 2) != "\r\n")
-        msg += "\r\n";
-    if (send(cFd, msg.c_str(), msg.length(), 0) == -1)
-        std::cout << "Send failed " << std::endl;
-}
+// void Server::sendToClient(int cFd, const std::string& message) 
+// {
+//     if (cFd == -1)
+//         return;
+//     std::string msg = message;
+//     if (msg.substr(msg.size() - 2) != "\r\n")
+//         msg += "\r\n";
+//     if (send(cFd, msg.c_str(), msg.length(), 0) == -1)
+//         std::cout << "Send failed " << std::endl;
+// }
 
 std::string &Server::cmdToUppercase(std::string &str)
 {
@@ -97,5 +97,5 @@ void Server::executeCmd(Client& client, const std::string& cmd)
           || args[0] == "PONG" || args[0] == "WHO" || args[0] == "QUIT")
         return;
     else
-        sendToClient(client.GetFd(), "Unknown command\n");
+        client.sendmsg("Unknown command\n");
 }

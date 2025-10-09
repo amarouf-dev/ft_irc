@@ -7,7 +7,10 @@ Server::Server(int port, const std::string &password)
 {
     this->port = htons(port);
     this->password = password;
+    this->serverName = "ircserv";
 }
+
+Server::~Server() { cleanUp(); }
 
 Channel* Server::getChannel(const std::string &channel_name)
 {
@@ -131,6 +134,7 @@ void Server::MainLoop()
                 c = FindClaintByFd(poll_fds[i].fd);
                 if (!c->GetBuffer().empty())
                 {
+                    //the actual sending happens heere
                     ssize_t n = send(poll_fds[i].fd, c->GetBuffer().c_str(), c->GetBuffer().size(), 0);
                     if (n > 0)
                     {
@@ -208,6 +212,27 @@ void Server::NewData(int Cfd)
 }
 
 
+void Server::cleanUp()
+{
+    // close client sockets
+    for (size_t i = 0; i < clients.size(); ++i)
+    {
+        close(clients[i].GetFd());
+    }
+    clients.clear();
+
+    for (size_t i = 0; i < channels.size(); ++i)
+    {
+        delete channels[i];
+    }
+    channels.clear();
+
+    // close server socket
+    if (sockfd != -1)
+        close(sockfd);
+
+    poll_fds.clear();
+}
 
 
 

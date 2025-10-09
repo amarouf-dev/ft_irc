@@ -78,13 +78,15 @@ class Server
 
     public:
         Server(int port, const std::string &password);
+        ~Server();
         void StartServer();
+        void cleanUp();
+
 
         void executeCmd(Client& client, const std::string& cmd);
         std::vector<std::string> get_arg(std::string cmd);
         std::string trim(const std::string& str);
         std::string &cmdToUppercase(std::string &str);
-        void sendToClient(int clientFd, const std::string& message) ;
 
         //--------------------------privmsg
         std::string joinMessageArgs(const std::vector<std::string> &args, size_t start);

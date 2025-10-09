@@ -4,27 +4,27 @@ void Server::handle_join(Client &client, const std::vector<std::string> &args)
 {
     if (!client.IsAuthenticated())
     {
-        sendToClient(client.GetFd(), "You must authenticate first with PASS");
+        client.sendmsg("You must authenticate first with PASS");
         return;
     }
 
     if (args.size() < 2 || args[1].empty())
     {
-        sendToClient(client.GetFd(), "JOIN :Not enough parameters");
+        client.sendmsg("JOIN :Not enough parameters");
         return;
     }
 
     std::string channel_name = args[1];
     if (channel_name.empty() || (channel_name[0] != '#' && channel_name[0] != '&'))
     {
-        sendToClient(client.GetFd(), "JOIN :Invalid channel name");
+        client.sendmsg("JOIN :Invalid channel name");
         return;
     }
 
     Channel* chan = getOrCreateChannel(channel_name);
     if (!chan)
     {
-        sendToClient(client.GetFd(), "JOIN :Server error creating channel");
+        client.sendmsg("JOIN :Server error creating channel");
         return;
     }
 
@@ -37,7 +37,7 @@ void Server::handle_join(Client &client, const std::vector<std::string> &args)
     {
         Client* m = *it;
         if (m)
-            sendToClient(m->GetFd(), prefix);
+            m->sendmsg(prefix);
     }
 
     std::string names;
@@ -57,8 +57,8 @@ void Server::handle_join(Client &client, const std::vector<std::string> &args)
     std::string r366 = ":" + serverName + " 366 " + client.GetNick() +
         " " + channel_name + " :End of /NAMES list\r\n";
 
-    sendToClient(client.GetFd(), r353);
-    sendToClient(client.GetFd(), r366);
+    client.sendmsg(r353);
+    client.sendmsg(r366);
 
     std::cout << GREEN << client.GetNick() << " joined " << channel_name << WHITE << std::endl;
 }

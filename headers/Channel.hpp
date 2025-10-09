@@ -28,7 +28,6 @@ class Channel
         Channel(const std::string &chanName);
 
         void addClient(Client *client);
-        // void removeClient(Client *client);
         void removeClaint(Client *client);
 
         bool is_member(Client *client);

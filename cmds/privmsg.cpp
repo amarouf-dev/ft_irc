@@ -47,7 +47,7 @@ void Server::sendToChannel(Channel* chan, const Client &sender, const std::strin
     {
         Client* m = *it;
         if (m && m->GetFd() != sender.GetFd())
-            sendToClient(m->GetFd(), message);
+            m->sendmsg(message);
     }
 }
 
@@ -55,19 +55,19 @@ void Server::sendToChannel(Channel* chan, const Client &sender, const std::strin
 void Server::sendToUser(Client* target, const std::string &message) 
 {
     if (target)
-        sendToClient(target->GetFd(), message);
+        target->sendmsg(message);
 }
 
 void Server::handle_privmsg(Client &client, const std::vector<std::string> &args) 
 {
     if (!client.IsAuthenticated()) 
     {
-        sendToClient(client.GetFd(), "You must authenticate first with PASS\r\n");
+        client.sendmsg("You must authenticate first with PASS\r\n");
         return;
     }
 
     if (args.size() < 3) {
-        sendToClient(client.GetFd(), "PRIVMSG :Not enough parameters\r\n");
+        client.sendmsg("PRIVMSG :Not enough parameters\r\n");
         return;
     }
 
@@ -79,14 +79,14 @@ void Server::handle_privmsg(Client &client, const std::vector<std::string> &args
     {
         Channel* chan = findChannelByName(target);
         if (!chan) {
-            sendToClient(client.GetFd(), "No such channel: " + target + "\r\n");
+            client.sendmsg("No such channel: " + target + "\r\n");
             return;
         }
         sendToChannel(chan, client, fullMsg);
     } else {
         Client* targetClient = findClientByNick(target);
         if (!targetClient) {
-            sendToClient(client.GetFd(), "No such nick: " + target + "\r\n");
+            client.sendmsg("No such nick: " + target + "\r\n");
             return;
         }
         sendToUser(targetClient, fullMsg);
