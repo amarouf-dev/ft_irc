@@ -4,8 +4,11 @@ bool Server::isNickTaken(const std::string &nick)
 {
     for (size_t i = 0; i < clients.size(); i++)
     {
-        if (clients[i].GetNick() == nick)
-            return true;
+        // if (clients[i].GetNick() == nick)
+        //     return true;
+        //!
+        if (clients[i]->GetNick() == nick)
+        return true;
     }
     return false;
 }
@@ -57,8 +60,11 @@ void Server::handle_nick(Client &client, const std::vector<std::string> &args)
         std::string msg = ":" + oldNick + " NICK :" + nick_arg + "\r\n";
         for (size_t i = 0; i < clients.size(); i++)
         {
-            if (clients[i].GetFd() != client.GetFd())
-                clients[i].sendmsg(msg);        
+            // if (clients[i].GetFd() != client.GetFd())
+            //     clients[i].sendmsg(msg);        
+            //!
+            if (clients[i]->GetFd() != client.GetFd())
+            clients[i]->sendmsg(msg); 
         }
     }
 

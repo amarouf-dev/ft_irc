@@ -34,8 +34,11 @@ Client* Server::findClientByNick(const std::string &nick)
 {
     for (size_t i = 0; i < clients.size(); i++) 
     {
-        if (clients[i].GetNick() == nick)
-            return &clients[i];
+        // if (clients[i].GetNick() == nick)
+        //     return &clients[i];
+        //!
+        if (clients[i]->GetNick() == nick)
+            return clients[i];
     }
     return NULL;
 }

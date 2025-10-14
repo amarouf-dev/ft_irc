@@ -25,6 +25,7 @@ void Server::handle_invite(Client &client, const std::vector<std::string> &args)
         return;
     }
 
+    // if (channel->GetInviteonly() && !channel->is_operator_in_channel(&client))
     if (channel->GetInviteonly() && !channel->isoperator(client.GetNick()))
     {
         client.sendmsg(":ircserv 482 " + client.GetNick() + " " + ch_name + " :You're not channel operator\r\n");

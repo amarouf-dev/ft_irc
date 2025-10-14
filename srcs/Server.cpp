@@ -29,10 +29,12 @@ Client *Server::FindClaintByFd(int fd)
 {
     for (unsigned long i = 0; i < clients.size(); i ++)
     {
-        if (clients[i].GetFd() == fd)
-        {
-            return (&clients[i]);
-        }
+        // if (clients[i].GetFd() == fd)
+        //     return (&clients[i]);
+        //!
+        if (clients[i]->GetFd() == fd)
+            return clients[i];
+
     }
     return (NULL);
 }
@@ -41,10 +43,11 @@ Client *Server::FindClaintByName(std::string name)
 {
      for (unsigned long i = 0; i < clients.size(); i ++)
     {
-        if (clients[i].GetNick() == name)
-        {
-            return (&clients[i]);
-        }
+        // if (clients[i].GetNick() == name)
+        //     return (&clients[i]);
+        //!
+        if (clients[i]->GetNick() == name)
+            return clients[i];
     }
     return (NULL);
 }
@@ -101,12 +104,23 @@ void Server::removeClient(int fd)
             poll_fds.erase(poll_fds.begin() + i);
         }
     }
-    for (unsigned long i = 0; i < clients.size(); i ++)
+    // for (unsigned long i = 0; i < clients.size(); i ++)
+    // {
+    //     if (clients[i].GetFd() == fd)
+    //     {
+    //         close (clients[i].GetFd());
+    //         clients.erase(clients.begin() + i);
+    //     }
+    // }
+    //!
+    for (size_t i = 0; i < clients.size(); i++)
     {
-        if (clients[i].GetFd() == fd)
+        if (clients[i]->GetFd() == fd)
         {
-            close (clients[i].GetFd());
+            close(clients[i]->GetFd());
+            delete clients[i]; // free memory
             clients.erase(clients.begin() + i);
+            break;
         }
     }
     close(fd);
@@ -164,13 +178,20 @@ void Server::NewClient()
 
     poll_fds.push_back(nc);
 
-    Client newC;
-    newC.SetFd(new_fd);
-    newC.SetIp(inet_ntoa(cliaddr.sin_addr));
-    // newC.SetCurChannel(NULL);
-    newC.SetPfd(&poll_fds.back());
+    // Client newC;
+    // newC.SetFd(new_fd);
+    // newC.SetIp(inet_ntoa(cliaddr.sin_addr));
+    // // newC.SetCurChannel(NULL);
+    // newC.SetPfd(&poll_fds.back());
 
+    // clients.push_back(newC);
+    //!
+    Client* newC = new Client();
+    newC->SetFd(new_fd);
+    newC->SetIp(inet_ntoa(cliaddr.sin_addr));
+    newC->SetPfd(&poll_fds.back());
     clients.push_back(newC);
+
     std::cout << GREEN << "Client (" << new_fd << ") Connected" << WHITE << std::endl;
 }
 
@@ -192,9 +213,24 @@ void Server::NewData(int Cfd)
         buffer[bytes] = '\0';
         for (size_t i = 0; i < clients.size(); i++)
         {
-            if (clients[i].GetFd() == Cfd)
+            // if (clients[i].GetFd() == Cfd)
+            // {
+            //     std::string &buff = clients[i].GetClientBuffer();
+            //     buff += buffer;
+            //     size_t pos;
+            //     while ((pos = buff.find("\r\n")) != std::string::npos)
+            //     {
+            //         std::string cmd = buff.substr(0, pos); //eextract one command 
+            //         buff.erase(0, pos + 2);                 
+            //         std::cout << "Received command: " << cmd << std::endl;
+            //         executeCmd(clients[i], cmd);
+            //     }
+            //     break;
+            // }
+            //!
+            if (clients[i]->GetFd() == Cfd)
             {
-                std::string &buff = clients[i].GetClientBuffer();
+                std::string &buff = clients[i]->GetClientBuffer();
                 buff += buffer;
                 size_t pos;
                 while ((pos = buff.find("\r\n")) != std::string::npos)
@@ -202,7 +238,9 @@ void Server::NewData(int Cfd)
                     std::string cmd = buff.substr(0, pos); //eextract one command 
                     buff.erase(0, pos + 2);                 
                     std::cout << "Received command: " << cmd << std::endl;
-                    executeCmd(clients[i], cmd);
+                    // executeCmd(clients[i], cmd);
+                    //!
+                    executeCmd(*clients[i], cmd);
                 }
                 break;
             }
@@ -217,7 +255,9 @@ void Server::cleanUp()
     // close client sockets
     for (size_t i = 0; i < clients.size(); ++i)
     {
-        close(clients[i].GetFd());
+        // close(clients[i].GetFd());
+        //!
+        close(clients[i]->GetFd());
     }
     clients.clear();
 

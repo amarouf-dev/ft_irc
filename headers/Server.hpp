@@ -39,7 +39,9 @@ class Server
         std::string password;
         std::string serverName;
 
-        std::vector<Client> clients;
+        // std::vector<Client> clients;
+        //! 
+        std::vector<Client*> clients;
         std::vector<pollfd> poll_fds;
         std::vector<Channel*> channels;
 
