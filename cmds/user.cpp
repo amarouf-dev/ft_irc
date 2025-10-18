@@ -1,4 +1,4 @@
-#include "../includes/Server.hpp"
+#include "../headers/Server.hpp"
 
 bool Server::isValidUsername(const std::string &username)
 {
@@ -13,24 +13,44 @@ bool Server::isValidUsername(const std::string &username)
     return true;
 }
 
+void Server::welcomeClient(Client &client)
+{
+    std::string nick = client.GetNick();
+    std::string user = client.GetUsername();
+    std::string host = client.GetIp();
+
+    
+    client.sendmsg(":" + serverName + " 001 " + nick + " :Welcome to the IRC network " +
+        nick + "!" + user + "@" + host + "\r\n");
+
+    client.sendmsg(":" + serverName + " 002 " + nick +
+            " :Your host is " + serverName + ", running version 1.0\r\n");
+
+    client.sendmsg(":" + serverName + " 003 " + nick +
+            " :This server was created just now\r\n");
+
+    client.sendmsg(":" + serverName + " 004 " + nick + " " + serverName +
+            " 1.0 oi nt\r\n");
+}
+
 void Server::handle_user(Client &client, const std::vector<std::string> &args)
 {
     if (!client.IsAuthenticated())
     {
-        sendToClient(client.GetFd(), "You must authenticate first with PASS\r\n");
+        client.sendmsg("You must authenticate first with PASS\r\n");
         return;
     }
 
     if (args.size() < 5)
     {
-        sendToClient(client.GetFd(), "USER :Not enough parameters\r\n");
+        client.sendmsg("USER :Not enough parameters\r\n");
         return;
     }
 
     std::string username = args[1];
     if (!isValidUsername(username))
     {
-        sendToClient(client.GetFd(), "Not the right chars for username\r\n");
+        client.sendmsg("Not the right chars for username\r\n");
         return;
     }
 
@@ -43,7 +63,7 @@ void Server::handle_user(Client &client, const std::vector<std::string> &args)
 
     if (realname.empty())
     {
-        sendToClient(client.GetFd(), "USER :Realname is required\r\n");
+        client.sendmsg("USER :Realname is required\r\n");
         return;
     }
 
@@ -51,10 +71,4 @@ void Server::handle_user(Client &client, const std::vector<std::string> &args)
 
     if (!client.GetNick().empty() && !client.GetUsername().empty() && !client.GetRealname().empty())
         welcomeClient(client);
-}
-
-void Server::welcomeClient(Client &client)
-{
-    std::string rep = "Welcome " + client.GetNick() + "!" + client.GetUsername() + "\r\n";
-    sendToClient(client.GetFd(), rep);
 }

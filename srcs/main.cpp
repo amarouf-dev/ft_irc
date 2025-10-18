@@ -1,5 +1,6 @@
-#include "includes/Server.hpp"
 
+
+#include "../headers/Server.hpp"
 
 int main (int ac, char **av)
 {
@@ -22,14 +23,3 @@ int main (int ac, char **av)
         std::cerr << e.what() << '\n';
     }
 }
-
-
-
-// --------------------TEST WITH HEXCHAT 
-//  in HexChat type these commands in order:
-//
-//    /PASS password   <-- must match the server password
-//    /NICK nickname
-//    /USER username 0 * :realname   <--pay attention to the syntax
-//
-//  Now you are authenticated u can /JOIN #chan  --> still figuring it out 

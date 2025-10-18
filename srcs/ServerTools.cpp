@@ -1,16 +1,16 @@
+#include "../headers/Server.hpp"
 
-#include "includes/Server.hpp"
 
-void Server::sendToClient(int cFd, const std::string& message) 
-{
-    if (cFd == -1)
-        return;
-    std::string msg = message;
-    if (msg.substr(msg.size() - 2) != "\r\n")
-        msg += "\r\n";
-    if (send(cFd, msg.c_str(), msg.length(), 0) == -1)
-        std::cout << "Send failed " << std::endl;
-}
+// void Server::sendToClient(int cFd, const std::string& message) 
+// {
+//     if (cFd == -1)
+//         return;
+//     std::string msg = message;
+//     if (msg.substr(msg.size() - 2) != "\r\n")
+//         msg += "\r\n";
+//     if (send(cFd, msg.c_str(), msg.length(), 0) == -1)
+//         std::cout << "Send failed " << std::endl;
+// }
 
 std::string &Server::cmdToUppercase(std::string &str)
 {
@@ -81,13 +81,21 @@ void Server::executeCmd(Client& client, const std::string& cmd)
         handle_nick(client, args);
     else if (args[0] == "USER")
         handle_user(client, args);
-    // else if (args[0] == "JOIN")
-    //     handle_join(client, args);
-    // else if (args[0] == "PRIVMSG")
-    //     handle_priv_msg(client, args);
+    else if (args[0] == "JOIN")
+        handle_join(client, args);
+    else if (args[0] == "PRIVMSG")
+        handle_privmsg(client, args);
+    else if (args[0] == "MODE")
+        handle_mode(client, args);
+    else if (args[0] == "INVITE")
+        handle_invite(client, args);
+    else if (args[0] == "TOPIC")
+        handle_topic(client, args);
+    else if (args[0] == "KICK")
+        handle_kick(client, args);
     else if (args[0] == "CAP" || args[0] == "PING"
           || args[0] == "PONG" || args[0] == "WHO" || args[0] == "QUIT")
         return;
     else
-        sendToClient(client.GetFd(), "Unknown command\n");
+        client.sendmsg("Unknown command\n");
 }

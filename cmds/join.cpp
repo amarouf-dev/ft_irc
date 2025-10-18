@@ -1,46 +1,68 @@
-#include "../includes/Server.hpp"
+#include "../headers/Server.hpp"
 
-
-void Server::handle_join(Client &client, const std::string &channel_name)
+void Server::handle_join(Client &client, const std::vector<std::string> &args)
 {
-    std::cout << "DEBUG: Client nick is '" << client.GetNick() << "'" << std::endl;
-
-    
     if (!client.IsAuthenticated())
     {
-        std::string msg = "You must authenticate first!\r\n";
-        send(client.GetFd(), msg.c_str(), msg.size(), 0);
+        client.sendmsg("You must authenticate first with PASS");
         return;
     }
 
-    //TODO: handle #
-    if (channel_name.empty() || channel_name[0] != '#')
+    if (args.size() < 2 || args[1].empty())
     {
-        std::string msg = "Invalid channel name. Must start with #\r\n";
-        send(client.GetFd(), msg.c_str(), msg.size(), 0);
+        client.sendmsg("JOIN :Not enough parameters");
+        return;
+    }
+
+    std::string channel_name = args[1];
+    if (channel_name.empty() || (channel_name[0] != '#' && channel_name[0] != '&'))
+    {
+        client.sendmsg("JOIN :Invalid channel name");
         return;
     }
 
     Channel* chan = getOrCreateChannel(channel_name);
+    if (!chan)
+    {
+        client.sendmsg("JOIN :Server error creating channel");
+        return;
+    }
 
     chan->addClient(&client);
 
-    // std::string msg = ":" + client.GetNick() + " JOIN " + channel_name + "\r\n";
-    // send(client.GetFd(), msg.c_str(), msg.size(), 0);
+    std::string prefix = ":" + client.GetNick() + "!" + client.GetUsername() 
+                            + "@" + client.GetIp() + " JOIN " + channel_name + "\r\n";
+    const std::set<Client *> &members = chan->getMembers();
+    for (std::set<Client*>::const_iterator it = members.begin(); it != members.end(); ++it)
+    {
+        Client* m = *it;
+        if (m)
+            m->sendmsg(prefix);
+    }
 
-    // //later
-    // for (size_t i = 0; i < chan->getMembers().size(); i++)
-    // {
-    //     Client* c = chan->getMembers()[i];
-    //     if (c->GetFd() != client.GetFd())
-    //     {
-    //         std::string join_msg = ":" + client.GetNick() + " JOIN " + channel_name + "\r\n";
-    //         send(c->GetFd(), join_msg.c_str(), join_msg.size(), 0);
-    //     }
-    // }
+    std::string names;
+    for (std::set<Client*>::const_iterator it = members.begin(); it != members.end(); ++it)
+    {
+        Client* m = *it;
+        if (!names.empty())
+            names += " ";
+        if (chan->is_operator_in_channel(m))
+            names += "@" + m->GetNick();   // operator p refix
+        else
+            names += m->GetNick();
+    }
+
+    std::string r353 = ":" + serverName + " 353 " + client.GetNick() +
+        " = " + channel_name + " :" + names + "\r\n";
+    std::string r366 = ":" + serverName + " 366 " + client.GetNick() +
+        " " + channel_name + " :End of /NAMES list\r\n";
+
+    client.sendmsg(r353);
+    client.sendmsg(r366);
 
     std::cout << GREEN << client.GetNick() << " joined " << channel_name << WHITE << std::endl;
 }
+
 
 Channel* Server::getOrCreateChannel(const std::string &channel_name)
 {
@@ -49,8 +71,6 @@ Channel* Server::getOrCreateChannel(const std::string &channel_name)
         if (channels[i]->getName() == channel_name)
             return channels[i];
     }
-
-    // make new one
     Channel* new_chan = new Channel(channel_name);
     channels.push_back(new_chan);
     return new_chan;
