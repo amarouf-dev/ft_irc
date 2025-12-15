@@ -4,6 +4,8 @@
 #include "Channel.hpp"
 #include <poll.h>
 #include <iostream>
+#include "NumericReplies.hpp"
+
 
 class Server;
 class Channel;
@@ -19,7 +21,6 @@ class Client
         std::string realname;
         std::string buffer;
         std::string outbuf;
-        Channel *cur_chnl;
 
         // pollfd *pfd;
         Server* server;

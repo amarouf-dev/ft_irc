@@ -20,55 +20,55 @@ void Server::welcomeClient(Client &client)
     std::string host = client.GetIp();
 
     
-    client.sendmsg(":" + serverName + " 001 " + nick + " :Welcome to the IRC network " +
-        nick + "!" + user + "@" + host + "\r\n");
-
-    client.sendmsg(":" + serverName + " 002 " + nick +
-            " :Your host is " + serverName + ", running version 1.0\r\n");
-
-    client.sendmsg(":" + serverName + " 003 " + nick +
-            " :This server was created just now\r\n");
-
-    client.sendmsg(":" + serverName + " 004 " + nick + " " + serverName +
-            " 1.0 oi nt\r\n");
+    client.sendmsg(Replies::RPL_WELCOME(serverName, nick, user, host));
+    client.sendmsg(Replies::RPL_YOURHOST(serverName, nick));
+    client.sendmsg(Replies::RPL_CREATED(serverName, nick));
+    client.sendmsg(Replies::RPL_MYINFO(serverName, nick));
 }
 
 void Server::handle_user(Client &client, const std::vector<std::string> &args)
 {
-    if (!client.IsAuthenticated())
+    if (!client.GetUsername().empty())
     {
-        client.sendmsg("You must authenticate first with PASS\r\n");
+        std::string reply = Replies::ERR_ALREADYREGISTERED(serverName, client.GetNick());
+        client.sendmsg(reply);
         return;
     }
 
     if (args.size() < 5)
     {
-        client.sendmsg("USER :Not enough parameters\r\n");
+        std::string reply = Replies::ERR_NEEDMOREPARAMS(serverName, client.GetNick(), "USER");
+        client.sendmsg(reply);
         return;
     }
 
     std::string username = args[1];
+
     if (!isValidUsername(username))
     {
-        client.sendmsg("Not the right chars for username\r\n");
+        client.sendmsg(":" + serverName + " NOTICE " + client.GetNick() + " :Invalid characters in username\r\n");
         return;
     }
 
     client.SetUsername(username);
 
-    // hexchat special syntax sends :
+    //!getBack2
     std::string realname = args[4];
     if (!realname.empty() && realname[0] == ':')
         realname = realname.substr(1);
 
     if (realname.empty())
     {
-        client.sendmsg("USER :Realname is required\r\n");
+        std::string reply = Replies::ERR_NEEDMOREPARAMS(serverName, client.GetNick(), "USER");
+        client.sendmsg(reply);
         return;
     }
 
     client.SetRealname(realname);
+    std::cout << "Client realname set to: " << client.GetRealname() << std::endl;
 
-    if (!client.GetNick().empty() && !client.GetUsername().empty() && !client.GetRealname().empty())
+
+    if (client.IsAuthenticated() &&  !client.GetNick().empty() && 
+        !client.GetUsername().empty() && !client.GetRealname().empty())
         welcomeClient(client);
 }

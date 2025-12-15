@@ -25,14 +25,6 @@ void Client::SetClientBuffer(const std::string &buf) { buffer = buf; }
 void Client::SetBuffer(const std::string& msg) { this->outbuf += msg; }
 // void Client::SetPfd(pollfd *npfd) { this->pfd = npfd; }
 
-
-
-// void Client::sendmsg(std::string msg)
-// {
-//     this->outbuf += msg;
-//     this->pfd->events |= POLLOUT;
-// }
-
 //!
 void Server::enableWriteEvent(int fd)
 {
@@ -48,7 +40,8 @@ void Server::enableWriteEvent(int fd)
 
 void Client::sendmsg(const std::string &msg)
 {
-    if (msg.empty()) return;
+    if (msg.empty()) 
+        return;
     outbuf += msg;
     if (server)
         server->enableWriteEvent(fd);

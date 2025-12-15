@@ -34,9 +34,6 @@ Client* Server::findClientByNick(const std::string &nick)
 {
     for (size_t i = 0; i < clients.size(); i++) 
     {
-        // if (clients[i].GetNick() == nick)
-        //     return &clients[i];
-        //!
         if (clients[i]->GetNick() == nick)
             return clients[i];
     }
@@ -65,12 +62,22 @@ void Server::handle_privmsg(Client &client, const std::vector<std::string> &args
 {
     if (!client.IsAuthenticated()) 
     {
-        client.sendmsg("You must authenticate first with PASS\r\n");
+        std::string reply = Replies::ERR_NOTREGISTERED(serverName, client.GetNick());
+        client.sendmsg(reply);
         return;
     }
 
-    if (args.size() < 3) {
-        client.sendmsg("PRIVMSG :Not enough parameters\r\n");
+    if (args.size() < 2 || args[1].empty())
+    {
+        std::string reply = Replies::ERR_NORECIPIENT(serverName, client.GetNick(), "PRIVMSG");
+        client.sendmsg(reply);
+        return;
+    }
+
+    if (args.size() < 3 || args[2].empty())
+    {
+        std::string reply = Replies::ERR_NOTEXTTOSEND(serverName, client.GetNick());
+        client.sendmsg(reply);
         return;
     }
 
@@ -81,15 +88,21 @@ void Server::handle_privmsg(Client &client, const std::vector<std::string> &args
     if (!target.empty() && (target[0] == '#' || target[0] == '&')) 
     {
         Channel* chan = findChannelByName(target);
-        if (!chan) {
-            client.sendmsg("No such channel: " + target + "\r\n");
+        if (!chan) 
+        {
+            std::string reply = Replies::ERR_NOSUCHCHANNEL(serverName, client.GetNick(), target);
+            client.sendmsg(reply);            
             return;
         }
         sendToChannel(chan, client, fullMsg);
-    } else {
+    } 
+    else 
+    {
         Client* targetClient = findClientByNick(target);
-        if (!targetClient) {
-            client.sendmsg("No such nick: " + target + "\r\n");
+        if (!targetClient) 
+        {
+            std::string reply = Replies::ERR_NOSUCHNICK(serverName, client.GetNick(), target);
+            client.sendmsg(reply);
             return;
         }
         sendToUser(targetClient, fullMsg);

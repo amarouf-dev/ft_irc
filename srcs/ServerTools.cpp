@@ -64,6 +64,7 @@ std::vector<std::string> Server::get_arg(std::string cmd)
     return args;
 }
 
+
 void Server::executeCmd(Client& client, const std::string& cmd)
 {
     if (cmd.empty())
@@ -87,6 +88,8 @@ void Server::executeCmd(Client& client, const std::string& cmd)
         handle_privmsg(client, args);
     else if (args[0] == "MODE")
         handle_mode(client, args);
+    else if (args[0] == "PART")
+        handle_part(client, args);
     else if (args[0] == "INVITE")
         handle_invite(client, args);
     else if (args[0] == "TOPIC")
@@ -97,5 +100,9 @@ void Server::executeCmd(Client& client, const std::string& cmd)
           || args[0] == "PONG" || args[0] == "WHO" || args[0] == "QUIT")
         return;
     else
-        client.sendmsg("Unknown command\n");
+    {
+        std::string input = client.GetNick().empty() ? "*" : client.GetNick();
+        client.sendmsg(":ircserv 421 " + input + " " + args[0] + " :Unknown command\r\n");
+        
+    }
 }

@@ -3,6 +3,8 @@
 
 #include "Server.hpp"
 #include "Client.hpp"
+#include "NumericReplies.hpp"
+
 
 class Client;
 class Channel;
@@ -22,6 +24,8 @@ class Channel
         
         std::set<Client*> members;
         std::set<Client*> operators;
+        std::set<Client*> invited; // track invited users 
+
 
     public:
 
@@ -53,6 +57,16 @@ class Channel
         void set_topic_restricted(bool var);
         bool is_client_in_channel(Client *client) const;
         bool is_operator_in_channel(Client *client) const;
+
+        bool GetTopicRestricted() const;
+        bool hasUserLimit() const;
+        size_t getUserLimit() const;
+        bool hasKey() const;
+        std::string getKey() const;
+
+        // ---------------- INVITE support
+        bool is_invited(Client *client) const;
+        void remove_invited(Client *client);
 };
 
 #endif

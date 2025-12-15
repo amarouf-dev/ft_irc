@@ -1,20 +1,42 @@
 
 #include "../headers/Channel.hpp"
 
-Channel::Channel(const std::string &chanName) : name(chanName) {}
+// Channel::Channel(const std::string &chanName) : name(chanName)  {}
+Channel::Channel(const std::string &chanName) 
+    : name(chanName), topic(""), inviteonly(false), topic_restricted(false),     
+    has_key(false), key(""), has_mem_lim(false), mem_lim(0) {}
 
+// void Channel::addClient(Client *client)
+// {
+// 	if (members.find(client) != members.end())
+// 		return ;
+//     members.insert(client);
+//     if (members.size() == 1)
+//         operators.insert(client);
+// }
+
+//******* 
 void Channel::addClient(Client *client)
 {
-	if (members.find(client) != members.end())
-		return ;
+    if (members.find(client) != members.end())
+        return;
+    
     members.insert(client);
     if (members.size() == 1)
         operators.insert(client);
+    
+    // Remove from invited list once they join
+    if (invited.find(client) != invited.end())
+        invited.erase(client);
 }
 
 void Channel::removeClaint(Client *client)
 {
     members.erase(client);
+    //******** 
+    operators.erase(client);
+    invited.erase(client); 
+
 	std::cout << YELLO << "The claint " << client->GetNick() << " was removed !" << WHITE << std::endl;
 }
 
@@ -59,9 +81,10 @@ void Channel::SetTopic(std::string n)
 
 bool Channel::isoperator(std::string name) const
 {
-    if (GetMemberByName(name))
-        return (true);
-    return (false);
+    Client* client = GetMemberByName(name);
+    if (!client)
+        return (false);
+    return operators.find(client) != operators.end();
 }
 
 void Channel::broadcast(const std::string &msg)
@@ -109,4 +132,40 @@ bool Channel::is_client_in_channel(Client *client) const {
 
 bool Channel::is_operator_in_channel(Client *client) const {
     return operators.find(client) != operators.end();
+}
+
+bool Channel::GetTopicRestricted() const
+{
+    return topic_restricted;
+}
+
+bool Channel::hasUserLimit() const 
+{
+    return has_mem_lim;
+}
+
+size_t Channel::getUserLimit() const 
+{
+    return mem_lim;
+}
+
+bool Channel::hasKey() const 
+{
+    return has_key;
+}
+
+std::string Channel::getKey() const 
+{
+    return key;
+}
+
+
+bool Channel::is_invited(Client *client) const
+{
+    return invited.find(client) != invited.end();
+}
+
+void Channel::remove_invited(Client *client)
+{
+    invited.erase(client);
 }

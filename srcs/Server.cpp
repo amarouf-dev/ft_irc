@@ -29,9 +29,7 @@ Client *Server::FindClaintByFd(int fd)
 {
     for (unsigned long i = 0; i < clients.size(); i ++)
     {
-        // if (clients[i].GetFd() == fd)
-        //     return (&clients[i]);
-        //!
+        //*
         if (clients[i]->GetFd() == fd)
             return clients[i];
 
@@ -43,9 +41,7 @@ Client *Server::FindClaintByName(std::string name)
 {
      for (unsigned long i = 0; i < clients.size(); i ++)
     {
-        // if (clients[i].GetNick() == name)
-        //     return (&clients[i]);
-        //!
+        //*
         if (clients[i]->GetNick() == name)
             return clients[i];
     }
@@ -102,17 +98,11 @@ void Server::removeClient(int fd)
         if (poll_fds[i].fd == fd)
         {
             poll_fds.erase(poll_fds.begin() + i);
+            break;
         }
     }
-    // for (unsigned long i = 0; i < clients.size(); i ++)
-    // {
-    //     if (clients[i].GetFd() == fd)
-    //     {
-    //         close (clients[i].GetFd());
-    //         clients.erase(clients.begin() + i);
-    //     }
-    // }
-    //!
+
+    //*
     for (size_t i = 0; i < clients.size(); i++)
     {
         if (clients[i]->GetFd() == fd)
@@ -178,20 +168,11 @@ void Server::NewClient()
 
     poll_fds.push_back(nc);
     
-    // Client newC;
-    // newC.SetFd(new_fd);
-    // newC.SetIp(inet_ntoa(cliaddr.sin_addr));
-    // // newC.SetCurChannel(NULL);
-    // newC.SetPfd(&poll_fds.back());
-    
-    // clients.push_back(newC);
-    //!
+    //*
     Client* newC = new Client();
     newC->SetFd(new_fd);
     newC->SetIp(inet_ntoa(cliaddr.sin_addr));
-    // std::cout << "heere" << std::endl;
-    // newC->SetPfd(&poll_fds.back());
-    newC->SetServer(this);     //! link to server
+    newC->SetServer(this);     //* link to server
 
 
     clients.push_back(newC);
@@ -217,21 +198,7 @@ void Server::NewData(int Cfd)
         buffer[bytes] = '\0';
         for (size_t i = 0; i < clients.size(); i++)
         {
-            // if (clients[i].GetFd() == Cfd)
-            // {
-            //     std::string &buff = clients[i].GetClientBuffer();
-            //     buff += buffer;
-            //     size_t pos;
-            //     while ((pos = buff.find("\r\n")) != std::string::npos)
-            //     {
-            //         std::string cmd = buff.substr(0, pos); //eextract one command 
-            //         buff.erase(0, pos + 2);                 
-            //         std::cout << "Received command: " << cmd << std::endl;
-            //         executeCmd(clients[i], cmd);
-            //     }
-            //     break;
-            // }
-            //!
+            //*
             if (clients[i]->GetFd() == Cfd)
             {
                 std::string &buff = clients[i]->GetClientBuffer();
@@ -242,8 +209,7 @@ void Server::NewData(int Cfd)
                     std::string cmd = buff.substr(0, pos); //eextract one command 
                     buff.erase(0, pos + 2);                 
                     std::cout << "Received command: " << cmd << std::endl;
-                    // executeCmd(clients[i], cmd);
-                    //!
+                    //*
                     executeCmd(*clients[i], cmd);
                 }
                 break;
@@ -253,14 +219,23 @@ void Server::NewData(int Cfd)
 
 }
 
+// Important subtlety: your code treats bytes <= 0 as disconnect for all cases
+// (including -1). That can mis-handle -1 caused by transient conditions 
+// (EINTR/EAGAIN). We should check errno.
+
+// If recv returned -1 and errno == EAGAIN, it’s not a disconnect — 
+// it just means "would block". Because you used poll, this is unlikely 
+// but still possible. Better check errno.
+//      If errno == EINTR it was interrupted; you might retry.
+//      If bytes == 0 → definitely disconnect.
+
 
 void Server::cleanUp()
 {
     // close client sockets
     for (size_t i = 0; i < clients.size(); ++i)
     {
-        // close(clients[i].GetFd());
-        //!
+        //*
         close(clients[i]->GetFd());
     }
     clients.clear();
@@ -279,99 +254,3 @@ void Server::cleanUp()
 }
 
 
-
-
-
-// void Server::NewData(int Cfd)
-// {
-//     char buffer[1024];
-//     // std::memset(buffer, 0, sizeof(buffer));
-
-//     int bytes = recv(Cfd, buffer, 1023, 0);
-//     if (bytes <= 0)
-//     {
-//         std::cout << RED << "Client (" << Cfd << ") Disconnected !" << WHITE << std::endl;
-//         removeClient(Cfd);
-//         return;
-//     }
-
-//     // std::string input(buffer);
-//     // std::cout << "Received: " << input << std::endl;  // debug
-
-//     // tokenize inpt
-//     // std::istringstream iss(input);
-//     // std::string command;
-//     // iss >> command;
-
-//     // for (size_t i = 0; i < command.size(); i++)
-//     //     command[i] = toupper(command[i]);
-
-//     // Client* client = FindClaintByFd(Cfd);
-
-//     buffer[bytes] = '\0';
-//     Client* c = FindClaintByFd(Cfd);
-//     if (!c) 
-//         return;
-
-//     c->GetClientBuffer() += buf;
-
-//     size_t pos;
-//     while ((pos = c->GetClientBuffer().find("\r\n")) != std::string::npos)
-//     {
-//         std::string cmd = c->GetClientBuffer().substr(0, pos);
-//         c->GetClientBuffer().erase(0, pos + 2);
-//         executeCmd(*c, cmd);
-//     }
-
-//     // if (command == "PASS")
-//     // {
-//     //     std::string pass_arg;
-//     //     iss >> pass_arg;
-//     //     handle_pass(*client, pass_arg);
-//     // }
-//     // else if (command == "NICK")
-//     // {
-//     //     std::string nick_arg;
-//     //     iss >> nick_arg;
-//     //     handle_nick(*client, nick_arg);
-//     // }
-//     // else if (command == "USER")
-//     // {
-//     //     std::vector<std::string> args;
-//     //     std::string arg;
-//     //     while (iss >> arg) args.push_back(arg);
-//     //     handle_user(*client, args);
-//     // }
-//     // else if (command == "JOIN")
-//     // {
-//     //     std::string chan;
-//     //     iss >> chan;
-//     //     handle_join(*client, chan);
-//     // }
-//     // else if (command == "TOPIC")
-//     // {
-//     //     std::vector<std::string> targs;
-//     //     std::string targ;
-//     //     while (iss >> targ) targs.push_back(targ);
-//     //     handle_topic(*client, targs);
-//     // }
-//     // else if (command == "INVITE")
-//     // {
-//     //     std::vector<std::string> iargs;
-//     //     std::string iarg;
-//     //     while (iss >> iarg) iargs.push_back(iarg);
-//     //     handle_invite(*client, iargs);
-//     // }
-//     // else if (command == "KICK")
-//     // {
-//     //     std::vector<std::string> Kargs;
-//     //     std::string Karg;
-//     //     while (iss >> Karg) Kargs.push_back(Karg);
-//     //     handle_kick(*client, Kargs);
-//     // }
-//     // else
-//     // {
-//     //     std::string rep = "Unknown command\r\n";
-//     //     client->sendmsg(rep);
-//     // }
-// }

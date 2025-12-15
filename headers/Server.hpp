@@ -21,6 +21,9 @@
 
 #include "Client.hpp"
 #include "Channel.hpp"
+#include "NumericReplies.hpp"
+
+
 
 #define RED "\e[1;31m"
 #define GREEN "\e[1;32m"
@@ -59,6 +62,7 @@ class Server
         void handle_join(Client &client, const std::vector<std::string> &args);
         void handle_privmsg(Client &client, const std::vector<std::string> &args);
         void handle_mode(Client &client, std::vector<std::string> &args);
+        void handle_part(Client &client, const std::vector<std::string> &args);
 
         void handle_kick(Client &client, const std::vector<std::string> &args);
         void handle_topic(Client &client, const std::vector<std::string> &args);
@@ -105,9 +109,10 @@ class Server
         int handle_mode_l(Client &client, Channel *chan, std::vector<std::string> &args, bool add, size_t &index);
         int handle_mode_o(Client &client, Channel *chan, std::vector<std::string> &args, bool add, size_t &index);
         void apply_channel_mode_flags(Client &client, Channel *chan, std::vector<std::string> &args);
-        void notify_channel_mode_change(Client &client, Channel *chan, const std::string &modes, const std::vector<std::string> &params);
+        void notify_channel_mode_change(Client &client, Channel* chan, const std::string &mode_string, const std::vector<std::string> &params);
 
         void enableWriteEvent(int fd); //!
-};
+        void joinSingleChannel(Client &client, const std::string &channel_name, const std::string &key);
+    };
 
 #endif
