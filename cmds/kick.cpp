@@ -9,8 +9,8 @@ void Server::handle_kick(Client &client, const std::vector<std::string> &args)
         return;
     }
 
-    std::string ch_name = args[0];
-    std::string targetNick = args[1];
+    std::string ch_name = args[1];
+    std::string targetNick = args[2];
     std::string reason = (args.size() > 2) ? args[2] : client.GetNick();
 
     if (args.size() > 2)

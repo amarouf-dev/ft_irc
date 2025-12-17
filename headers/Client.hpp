@@ -4,8 +4,10 @@
 #include "Channel.hpp"
 #include <poll.h>
 #include <iostream>
+#include "NumericReplies.hpp"
 
-class Client;
+
+class Server;
 class Channel;
 
 class Client
@@ -18,11 +20,10 @@ class Client
         std::string username;
         std::string realname;
         std::string buffer;
-
         std::string outbuf;
-        pollfd *pfd;
 
-        Channel *cur_chnl;
+        // pollfd *pfd;
+        Server* server;
 
     public:
 
@@ -35,7 +36,7 @@ class Client
         std::string GetRealname() const;
         std::string &GetClientBuffer();
         std::string& GetBuffer();
-        pollfd *GetPfd(void) const;
+        // pollfd *GetPfd(void) const;
 
         void SetFd(int);
         void SetIp(std::string);
@@ -44,7 +45,9 @@ class Client
         void SetRealname(const std::string &real);
         void SetClientBuffer(const std::string &buf);
         void SetBuffer(const std::string&);
-        void SetPfd(pollfd *pfd);
+        // void SetPfd(pollfd *pfd);
+        void SetServer(Server* s) { server = s; } //! 
+
 
         
         //--------------------------
@@ -53,7 +56,9 @@ class Client
 
 
         // Use instead of send:
-        void sendmsg(std::string);
+        // void sendmsg(std::string);
+        void sendmsg(const std::string &msg); //!
+
 };
 
 #endif

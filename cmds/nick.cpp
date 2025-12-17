@@ -4,72 +4,87 @@ bool Server::isNickTaken(const std::string &nick)
 {
     for (size_t i = 0; i < clients.size(); i++)
     {
-        // if (clients[i].GetNick() == nick)
-        //     return true;
-        //!
         if (clients[i]->GetNick() == nick)
-        return true;
+            return true;
     }
     return false;
 }
 
 bool Server::isValidNickName(const std::string &str)
 {
-    if (str.empty() || !isalpha(str[0]))
+    if (str.empty() || str.length() > 9 || !isalpha(str[0]))
         return false;
-    for (size_t i = 0; i < str.size(); i++)
+
+    for (size_t i = 1; i < str.size(); i++)
     {
-        if (!isalpha(str[i]) && !isdigit(str[i]) && str[i] != '-' && str[i] != '_')
+        if (!isalpha(str[i]) && !isdigit(str[i]) && 
+            str[i] != '-' && str[i] != '[' && str[i] != ']' && str[i] != '\\' && 
+            str[i] != '`' && str[i] != '_' && str[i] != '^' && str[i] != '{' && 
+            str[i] != '}' && str[i] != '|')
             return false;
     }
+
     return true;
 }
 
 void Server::handle_nick(Client &client, const std::vector<std::string> &args)
 {
-    if (!client.IsAuthenticated())
-    {
-        client.sendmsg("You must authenticate first with PASS\r\n");
-        return;
-    }
-
     if (args.size() < 2 || args[1].empty())
     {
-        client.sendmsg("No nickname given\r\n");
+        std::string reply = Replies::ERR_NONICKNAMEGIVEN(serverName, client.GetNick());
+        client.sendmsg(reply);
         return;
     }
 
     const std::string &nick_arg = args[1];
+
     if (isNickTaken(nick_arg))
     {
-        client.sendmsg("Nickname is already in use\r\n");
+        std::string reply = Replies::ERR_NICKNAMEINUSE(serverName, client.GetNick(), nick_arg);
+        client.sendmsg(reply);
         return;
     }
 
     if (!isValidNickName(nick_arg))
     {
-        client.sendmsg("Not allowed chars for a nickname\r\n");
+        std::string reply = Replies::ERR_ERRONEUSNICKNAME(serverName, client.GetNick(), nick_arg);
+        client.sendmsg(reply);
         return;
     }
 
     std::string oldNick = client.GetNick();
+    bool wasRegistered = client.IsAuthenticated() && !oldNick.empty() && 
+                         !client.GetUsername().empty() && !client.GetRealname().empty();
     client.SetNick(nick_arg);
 
-    if (!oldNick.empty() && oldNick != nick_arg)
-    {
-        std::string msg = ":" + oldNick + " NICK :" + nick_arg + "\r\n";
-        for (size_t i = 0; i < clients.size(); i++)
-        {
-            // if (clients[i].GetFd() != client.GetFd())
-            //     clients[i].sendmsg(msg);        
-            //!
-            if (clients[i]->GetFd() != client.GetFd())
-            clients[i]->sendmsg(msg); 
-        }
-    }
 
-    client.sendmsg("Nickname set to " + nick_arg + "\r\n");
-
-    if (!client.GetNick().empty() && !client.GetUsername().empty() && !client.GetRealname().empty())
-        welcomeClient(client);
+    if (wasRegistered)
+   {
+       std::string msg = ":" + oldNick + "!" + client.GetUsername() + 
+                       "@" + client.GetIp() + " NICK :" + nick_arg + "\r\n";
+       
+       client.sendmsg(msg);
+       
+       std::set<Client*> notified;
+       for (size_t i = 0; i < channels.size(); i++)
+       {
+           if (channels[i]->is_client_in_channel(&client))
+           {
+               const std::set<Client*>& members = channels[i]->getMembers();
+               for (std::set<Client*>::const_iterator it = members.begin(); 
+                   it != members.end(); ++it)
+               {
+                   if (*it != &client && notified.find(*it) == notified.end())
+                   {
+                       (*it)->sendmsg(msg);
+                       notified.insert(*it);
+                   }
+               }
+           }
+       }
+   }
+   // ghir if registered for the first time send welcome messages
+   else if (client.IsAuthenticated() && !client.GetUsername().empty() && 
+            !client.GetRealname().empty())
+       welcomeClient(client);
 }
