@@ -11,12 +11,17 @@ void Server::handle_kick(Client &client, const std::vector<std::string> &args)
 
     std::string ch_name = args[1];
     std::string targetNick = args[2];
-    std::string reason = (args.size() > 2) ? args[2] : client.GetNick();
+    std::string reason;
 
-    if (args.size() > 2)
+
+    
+    if (args.size() > 3)
     {
-        reason = args[2];
-        for (size_t i = 3; i < args.size(); i++)
+        std::string new_topic = args[3];
+        if (!new_topic.empty() && new_topic[0] == ':')
+            new_topic.erase(0, 1);
+        reason = new_topic;
+        for (size_t i = 4; i < args.size(); i++)
             reason += " " + args[i];
     }
     else

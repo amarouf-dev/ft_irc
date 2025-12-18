@@ -3,13 +3,13 @@
 
 void Server::handle_topic(Client &client, const std::vector<std::string> &args)
 {
-    if (args.size() == 0) 
+    if (args.size() < 2) 
     {
         std::string msg = Replies::ERR_NEEDMOREPARAMS(serverName, client.GetNick(), "TOPIC");
         client.sendmsg(msg);
         return;
     }
-
+    
     if (!client.IsAuthenticated())
     {
         std::string reply = Replies::ERR_NOTREGISTERED(serverName, client.GetNick());
@@ -17,8 +17,8 @@ void Server::handle_topic(Client &client, const std::vector<std::string> &args)
         return;
     }
 
-
     Channel *chan = getChannel(args[1]);
+    // std::cout << args[1] << "HERE\n";
     if (!chan)
     {
         std::string msg = Replies::ERR_NOSUCHCHANNEL(serverName, client.GetNick(), args[1]);
@@ -48,7 +48,6 @@ void Server::handle_topic(Client &client, const std::vector<std::string> &args)
         return;
     }
 
-
     if (chan->GetTopicRestricted() && !chan->isoperator(client.GetNick()))
     {
         std::string msg = Replies::ERR_CHANOPRIVSNEEDED(serverName, client.GetNick(), args[1]);
@@ -57,7 +56,7 @@ void Server::handle_topic(Client &client, const std::vector<std::string> &args)
     }
 
     std::string new_topic = args[2];
-    if (!new_topic.empty())
+    if (!new_topic.empty() && new_topic[0] == ':')
         new_topic.erase(0, 1);
     std::cout << RED << new_topic << WHITE << std::endl;
     for (size_t i = 3; i < args.size(); i++)

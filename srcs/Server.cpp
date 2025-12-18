@@ -209,7 +209,7 @@ void Server::NewData(int Cfd)
             if (errno == EAGAIN || errno == EWOULDBLOCK)
             {
                return ;
-            } 
+            }
             else if (errno == EINTR)
             {
                 return ;
