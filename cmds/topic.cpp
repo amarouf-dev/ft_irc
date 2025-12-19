@@ -18,7 +18,6 @@ void Server::handle_topic(Client &client, const std::vector<std::string> &args)
     }
 
     Channel *chan = getChannel(args[1]);
-    // std::cout << args[1] << "HERE\n";
     if (!chan)
     {
         std::string msg = Replies::ERR_NOSUCHCHANNEL(serverName, client.GetNick(), args[1]);
@@ -58,7 +57,6 @@ void Server::handle_topic(Client &client, const std::vector<std::string> &args)
     std::string new_topic = args[2];
     if (!new_topic.empty() && new_topic[0] == ':')
         new_topic.erase(0, 1);
-    std::cout << RED << new_topic << WHITE << std::endl;
     for (size_t i = 3; i < args.size(); i++)
         new_topic += " " + args[i];
     chan->SetTopic(new_topic);
@@ -67,27 +65,3 @@ void Server::handle_topic(Client &client, const std::vector<std::string> &args)
                                "@" + client.GetIp() + " TOPIC " + args[1] + " :" + new_topic + "\r\n";
     chan->broadcast(broadcastMsg);
 }
-
-// **************************Issues**************************
-// 1 authentication check to verify user is registered first // DONE
-
-// 2 missing Channel Parameter not handled
-
-// 3 channel name apears in topic with this test "/topic #chan" 
-// test : /topic #chan Hello world
-// ---> expected Behavior: Topic for #chan :Hello World
-// ---> current behavior:  Topic for #chan :#chan Hello World // DONE
-
-// 4 handling :
-// test : /topic #chan :Hello world
-// ---> expected Behavior: Topic for #chan is: Hello world
-// ---> current behavior:  Topic for #chan is: :Hello world // DONE
-
-// 5 when channel mode +t is OFF ( /mode #chan -t ) the IRC reference say any user can change the channel topic even non-operator
-// in this test a regular user should be allowed to set the topic
-// our code always requires operator privileges, even when +t is not set // DONE 
-
-
-
-
-

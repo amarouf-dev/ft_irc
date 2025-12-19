@@ -95,4 +95,5 @@ void Server::handle_nick(Client &client, const std::vector<std::string> &args)
        else if (client.IsAuthenticated() && !client.GetUsername().empty() && 
                 !client.GetRealname().empty())
            welcomeClient(client);
+    }
 }
