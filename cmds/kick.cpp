@@ -11,8 +11,26 @@ void Server::handle_kick(Client &client, const std::vector<std::string> &args)
     }
 
     std::string ch_name = args[1];
-    std::string targetNick = args[2];
+    std::string users_list = args[2];
+    std::vector<std::string> users_to_kick;
     std::string reason;
+
+    size_t pos = 0;
+    size_t comma_pos;
+
+    while ((comma_pos = users_list.find(',', pos)) != std::string::npos)
+    {
+        std::string ch = users_list.substr(pos, comma_pos - pos);
+        ch = trim(ch);
+        if (!ch.empty())
+            users_to_kick.push_back(ch);
+        pos = comma_pos + 1;
+    }
+
+    std::string last_ch = users_list.substr(pos);
+    last_ch = trim(last_ch);
+    if (!last_ch.empty())
+        users_to_kick.push_back(last_ch);
 
     if (args.size() > 3)
     {
@@ -47,19 +65,23 @@ void Server::handle_kick(Client &client, const std::vector<std::string> &args)
         client.sendmsg(reply);        
         return;
     }
-    Client *target = chnl->GetMemberByName(targetNick);
 
-    if (!target)
+    for (size_t i = 0; i < users_to_kick.size(); i ++)
     {
-        std::string reply = Replies::ERR_USERNOTINCHANNEL(serverName, client.GetNick(), ch_name, ch_name);
-        client.sendmsg(reply);
-        return ;
+        Client *target = chnl->GetMemberByName(users_to_kick[i]);
+    
+        if (!target)
+        {
+            std::string reply = Replies::ERR_USERNOTINCHANNEL(serverName, client.GetNick(), users_to_kick[i], ch_name);
+            client.sendmsg(reply);
+            continue;
+        }
+    
+        std::string kickMsg = ":" + client.GetNick() + "!" + client.GetUsername() +
+                              "@" + client.GetIp() + " KICK " + ch_name + " " +
+                              users_to_kick[i] + " :" + reason + "\r\n";
+    
+        chnl->broadcast(kickMsg);
+        chnl->removeClaint(target);
     }
-
-    std::string kickMsg = ":" + client.GetNick() + "!" + client.GetUsername() +
-                          "@" + client.GetIp() + " KICK " + ch_name + " " +
-                          targetNick + " :" + reason + "\r\n";
-
-    chnl->broadcast(kickMsg);
-    chnl->removeClaint(target);
 }
