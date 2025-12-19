@@ -28,47 +28,56 @@ void Server::welcomeClient(Client &client)
 
 void Server::handle_user(Client &client, const std::vector<std::string> &args)
 {
-    if (!client.GetUsername().empty())
+    if (!client.IsAuthenticated())
     {
-        std::string reply = Replies::ERR_ALREADYREGISTERED(serverName, client.GetNick());
+        std::string reply = Replies::ERR_NOTREGISTERED(serverName, client.GetNick());
         client.sendmsg(reply);
         return;
     }
-
-    if (args.size() < 5)
+    else
     {
-        std::string reply = Replies::ERR_NEEDMOREPARAMS(serverName, client.GetNick(), "USER");
-        client.sendmsg(reply);
-        return;
+        if (!client.GetUsername().empty())
+        {
+            std::string reply = Replies::ERR_ALREADYREGISTERED(serverName, client.GetNick());
+            client.sendmsg(reply);
+            return;
+        }
+    
+        if (args.size() < 5)
+        {
+            std::string reply = Replies::ERR_NEEDMOREPARAMS(serverName, client.GetNick(), "USER");
+            client.sendmsg(reply);
+            return;
+        }
+    
+        std::string username = args[1];
+    
+        if (!isValidUsername(username))
+        {
+            client.sendmsg(":" + serverName + " NOTICE " + client.GetNick() + " :Invalid characters in username\r\n");
+            return;
+        }
+    
+        client.SetUsername(username);
+    
+        //!getBack2
+        std::string realname = args[4];
+        if (!realname.empty() && realname[0] == ':')
+            realname = realname.substr(1);
+    
+        if (realname.empty())
+        {
+            std::string reply = Replies::ERR_NEEDMOREPARAMS(serverName, client.GetNick(), "USER");
+            client.sendmsg(reply);
+            return;
+        }
+    
+        client.SetRealname(realname);
+        std::cout << "Client realname set to: " << client.GetRealname() << std::endl;
+    
+    
+        if (client.IsAuthenticated() &&  !client.GetNick().empty() && 
+            !client.GetUsername().empty() && !client.GetRealname().empty())
+            welcomeClient(client);
     }
-
-    std::string username = args[1];
-
-    if (!isValidUsername(username))
-    {
-        client.sendmsg(":" + serverName + " NOTICE " + client.GetNick() + " :Invalid characters in username\r\n");
-        return;
-    }
-
-    client.SetUsername(username);
-
-    //!getBack2
-    std::string realname = args[4];
-    if (!realname.empty() && realname[0] == ':')
-        realname = realname.substr(1);
-
-    if (realname.empty())
-    {
-        std::string reply = Replies::ERR_NEEDMOREPARAMS(serverName, client.GetNick(), "USER");
-        client.sendmsg(reply);
-        return;
-    }
-
-    client.SetRealname(realname);
-    std::cout << "Client realname set to: " << client.GetRealname() << std::endl;
-
-
-    if (client.IsAuthenticated() &&  !client.GetNick().empty() && 
-        !client.GetUsername().empty() && !client.GetRealname().empty())
-        welcomeClient(client);
 }

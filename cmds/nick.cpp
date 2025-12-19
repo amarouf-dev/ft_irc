@@ -29,62 +29,70 @@ bool Server::isValidNickName(const std::string &str)
 
 void Server::handle_nick(Client &client, const std::vector<std::string> &args)
 {
-    if (args.size() < 2 || args[1].empty())
+    if (!client.IsAuthenticated())
     {
-        std::string reply = Replies::ERR_NONICKNAMEGIVEN(serverName, client.GetNick());
+        std::string reply = Replies::ERR_NOTREGISTERED(serverName, client.GetNick());
         client.sendmsg(reply);
         return;
     }
-
-    const std::string &nick_arg = args[1];
-
-    if (isNickTaken(nick_arg))
+    else
     {
-        std::string reply = Replies::ERR_NICKNAMEINUSE(serverName, client.GetNick(), nick_arg);
-        client.sendmsg(reply);
-        return;
-    }
-
-    if (!isValidNickName(nick_arg))
-    {
-        std::string reply = Replies::ERR_ERRONEUSNICKNAME(serverName, client.GetNick(), nick_arg);
-        client.sendmsg(reply);
-        return;
-    }
-
-    std::string oldNick = client.GetNick();
-    bool wasRegistered = client.IsAuthenticated() && !oldNick.empty() && 
-                         !client.GetUsername().empty() && !client.GetRealname().empty();
-    client.SetNick(nick_arg);
-
-
-    if (wasRegistered)
-   {
-       std::string msg = ":" + oldNick + "!" + client.GetUsername() + 
-                       "@" + client.GetIp() + " NICK :" + nick_arg + "\r\n";
-       
-       client.sendmsg(msg);
-       
-       std::set<Client*> notified;
-       for (size_t i = 0; i < channels.size(); i++)
+        if (args.size() < 2 || args[1].empty())
+        {
+            std::string reply = Replies::ERR_NONICKNAMEGIVEN(serverName, client.GetNick());
+            client.sendmsg(reply);
+            return;
+        }
+    
+        const std::string &nick_arg = args[1];
+    
+        if (isNickTaken(nick_arg))
+        {
+            std::string reply = Replies::ERR_NICKNAMEINUSE(serverName, client.GetNick(), nick_arg);
+            client.sendmsg(reply);
+            return;
+        }
+    
+        if (!isValidNickName(nick_arg))
+        {
+            std::string reply = Replies::ERR_ERRONEUSNICKNAME(serverName, client.GetNick(), nick_arg);
+            client.sendmsg(reply);
+            return;
+        }
+    
+        std::string oldNick = client.GetNick();
+        bool wasRegistered = client.IsAuthenticated() && !oldNick.empty() && 
+                             !client.GetUsername().empty() && !client.GetRealname().empty();
+        client.SetNick(nick_arg);
+    
+    
+        if (wasRegistered)
        {
-           if (channels[i]->is_client_in_channel(&client))
+           std::string msg = ":" + oldNick + "!" + client.GetUsername() + 
+                           "@" + client.GetIp() + " NICK :" + nick_arg + "\r\n";
+           
+           client.sendmsg(msg);
+           
+           std::set<Client*> notified;
+           for (size_t i = 0; i < channels.size(); i++)
            {
-               const std::set<Client*>& members = channels[i]->getMembers();
-               for (std::set<Client*>::const_iterator it = members.begin(); 
-                   it != members.end(); ++it)
+               if (channels[i]->is_client_in_channel(&client))
                {
-                   if (*it != &client && notified.find(*it) == notified.end())
+                   const std::set<Client*>& members = channels[i]->getMembers();
+                   for (std::set<Client*>::const_iterator it = members.begin(); 
+                       it != members.end(); ++it)
                    {
-                       (*it)->sendmsg(msg);
-                       notified.insert(*it);
+                       if (*it != &client && notified.find(*it) == notified.end())
+                       {
+                           (*it)->sendmsg(msg);
+                           notified.insert(*it);
+                       }
                    }
                }
            }
        }
-   }
-   // ghir if registered for the first time send welcome messages
-   else if (client.IsAuthenticated() && !client.GetUsername().empty() && 
-            !client.GetRealname().empty())
-       welcomeClient(client);
+       // ghir if registered for the first time send welcome messages
+       else if (client.IsAuthenticated() && !client.GetUsername().empty() && 
+                !client.GetRealname().empty())
+           welcomeClient(client);
 }
