@@ -2,12 +2,14 @@
 
 #include "../headers/Server.hpp"
 
+int Server::stop = 1;
 
 Server::Server(int port, const std::string &password)
 {
     this->port = htons(port);
     this->password = password;
     this->serverName = "ircserv";
+    stop = 1;
 }
 
 Server::~Server() { cleanUp(); }
@@ -23,7 +25,6 @@ Channel* Server::getChannel(const std::string &channel_name)
     }
     return (NULL);
 }
-
 
 Client *Server::FindClaintByFd(int fd)
 {
@@ -116,11 +117,20 @@ void Server::removeClient(int fd)
     close(fd);
 }
 
+void Server::signal_handler(int)
+{
+    std::cout << RED << "Server stops !" << WHITE << std::endl;
+    stop = 0;
+    exit(0);
+}
+
 void Server::MainLoop()
 {
     Client *c = NULL;
 
-    while (true)
+    signal(SIGINT, signal_handler);
+
+    while (stop)
     {
         if (poll(&poll_fds[0], poll_fds.size(), -1) == -1)
             throw (std::runtime_error("Poll failed !"));
@@ -189,15 +199,6 @@ void Server::NewData(int Cfd)
     int bytes = recv(Cfd, buffer, 1023, 0);
     if (bytes <= 0)
     {
-        // Important subtlety: your code treats bytes <= 0 as disconnect for all cases
-        // (including -1). That can mis-handle -1 caused by transient conditions 
-        // (EINTR/EAGAIN). We should check errno.
-
-        // If recv returned -1 and errno == EAGAIN, it’s not a disconnect — 
-        // it just means "would block". Because you used poll, this is unlikely 
-        // but still possible. Better check errno.
-        //      If errno == EINTR it was interrupted; you might retry.
-        //      If bytes == 0 → definitely disconnect.
         if (bytes == 0)
         {
             std::cout << RED << "Client (" << Cfd << ") Disconnected !" << WHITE << std::endl;
@@ -207,13 +208,9 @@ void Server::NewData(int Cfd)
         else
         {
             if (errno == EAGAIN || errno == EWOULDBLOCK)
-            {
                return ;
-            }
             else if (errno == EINTR)
-            {
                 return ;
-            }
             else
             {
                 std::cout << RED << "Client (" << Cfd << ") Disconnected !" << WHITE << std::endl;
@@ -245,19 +242,7 @@ void Server::NewData(int Cfd)
             }
         }
     }
-
 }
-
-// Important subtlety: your code treats bytes <= 0 as disconnect for all cases
-// (including -1). That can mis-handle -1 caused by transient conditions 
-// (EINTR/EAGAIN). We should check errno.
-
-// If recv returned -1 and errno == EAGAIN, it’s not a disconnect — 
-// it just means "would block". Because you used poll, this is unlikely 
-// but still possible. Better check errno.
-//      If errno == EINTR it was interrupted; you might retry.
-//      If bytes == 0 → definitely disconnect. // DONE FIXED 
-
 
 void Server::cleanUp()
 {

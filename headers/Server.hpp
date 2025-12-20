@@ -19,6 +19,7 @@
 #include <string>
 #include <iostream>
 #include <errno.h>
+#include <csignal>
 
 #include "Client.hpp"
 #include "Channel.hpp"
@@ -43,8 +44,8 @@ class Server
         std::string password;
         std::string serverName;
 
-        // std::vector<Client> clients;
-        //! 
+        static int stop;
+
         std::vector<Client*> clients;
         std::vector<pollfd> poll_fds;
         std::vector<Channel*> channels;
@@ -89,6 +90,7 @@ class Server
         void StartServer();
         void cleanUp();
 
+        static void signal_handler(int);
 
         void executeCmd(Client& client, const std::string& cmd);
         std::vector<std::string> get_arg(std::string cmd);
@@ -115,5 +117,5 @@ class Server
         void enableWriteEvent(int fd); //!
         void joinSingleChannel(Client &client, const std::string &channel_name, const std::string &key);
     };
-
+    
 #endif
