@@ -189,7 +189,11 @@ void Server::apply_channel_mode_flags(Client &client, Channel *chan, std::vector
     }
 
     if (!applied_modes.empty())
+    {
         notify_channel_mode_change(client, chan, applied_modes, applied_params);
+    }
+    
+        applied_params.clear();
 }
 
 int Server::handle_mode_i(Channel *chan, bool add)

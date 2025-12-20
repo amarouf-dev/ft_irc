@@ -84,4 +84,5 @@ void Server::handle_kick(Client &client, const std::vector<std::string> &args)
         chnl->broadcast(kickMsg);
         chnl->removeClaint(target);
     }
+    users_to_kick.clear();
 }

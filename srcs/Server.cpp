@@ -249,7 +249,7 @@ void Server::cleanUp()
     // close client sockets
     for (size_t i = 0; i < clients.size(); ++i)
     {
-        //*
+        delete clients[i];
         close(clients[i]->GetFd());
     }
     clients.clear();

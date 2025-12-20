@@ -157,6 +157,8 @@ void Server::handle_join(Client &client, const std::vector<std::string> &args)
 
         joinSingleChannel(client, channel_name, key);
     }
+    channels_to_join.clear();
+    keys.clear();
 }
 
 

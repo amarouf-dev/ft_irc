@@ -105,4 +105,5 @@ void Server::executeCmd(Client& client, const std::string& cmd)
         client.sendmsg(":ircserv 421 " + input + " " + args[0] + " :Unknown command\r\n");
         
     }
+    args.clear();
 }
