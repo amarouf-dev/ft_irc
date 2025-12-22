@@ -2,8 +2,6 @@
 
 void Server::joinSingleChannel(Client &client, const std::string &channel_name, const std::string &key)
 {
-    // (void)key;
-     
     Channel* chan = getOrCreateChannel(channel_name);
     if (!chan)
     {
@@ -54,7 +52,6 @@ void Server::joinSingleChannel(Client &client, const std::string &channel_name, 
             m->sendmsg(prefix);
     }
 
-    // Send topic if set
     if (!chan->GetTopic().empty())
     {
         std::string topic_msg = ":" + serverName + " 332 " + client.GetNick() + " " +
@@ -62,7 +59,6 @@ void Server::joinSingleChannel(Client &client, const std::string &channel_name, 
         client.sendmsg(topic_msg);
     }
 
-    // send NAMES list to the joining client //! needs res
     std::string names;
     for (std::set<Client*>::const_iterator it = members.begin(); it != members.end(); ++it)
     {
@@ -98,7 +94,6 @@ void Server::handle_join(Client &client, const std::vector<std::string> &args)
         return;
     }
     
-
     std::vector<std::string> channels_to_join;
     std::string channel_list = args[1];
     size_t pos = 0;
@@ -113,13 +108,11 @@ void Server::handle_join(Client &client, const std::vector<std::string> &args)
         pos = comma_pos + 1;
     }
 
-    //  last channel or only channel if no commas
     std::string last_ch = channel_list.substr(pos);
     last_ch = trim(last_ch);
     if (!last_ch.empty())
         channels_to_join.push_back(last_ch);
 
-    // split keys if provided
     std::vector<std::string> keys;
     if (args.size() >= 3 && !args[2].empty())
     {

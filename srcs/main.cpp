@@ -1,5 +1,3 @@
-
-
 #include "../headers/Server.hpp"
 
 int main (int ac, char **av)
@@ -22,4 +20,5 @@ int main (int ac, char **av)
     {
         std::cerr << e.what() << '\n';
     }
+    return 0;
 }

@@ -1,6 +1,5 @@
 #include "../headers/Server.hpp"
 
-
 void Server::handle_part(Client &client, const std::vector<std::string> &args)
 {
     if (!client.IsAuthenticated())
@@ -44,7 +43,6 @@ void Server::handle_part(Client &client, const std::vector<std::string> &args)
     if (args.size() >= 3)
     {
         part_message = args[2];
-        // remove : if present
         if (!part_message.empty() && part_message[0] == ':')
             part_message = part_message.substr(1);
     }
@@ -67,7 +65,6 @@ void Server::handle_part(Client &client, const std::vector<std::string> &args)
 
     std::cout << RED << client.GetNick() << " left channel " << channel_name << WHITE << std::endl;
 
-    // think other way: clean up empty channels
     if (chan->getMembers().empty())
     {
         for (std::vector<Channel*>::iterator it = channels.begin(); it != channels.end(); ++it)

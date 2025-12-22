@@ -60,7 +60,6 @@ void Server::handle_user(Client &client, const std::vector<std::string> &args)
     
         client.SetUsername(username);
     
-        //!getBack2
         std::string realname = args[4];
         if (!realname.empty() && realname[0] == ':')
             realname = realname.substr(1);

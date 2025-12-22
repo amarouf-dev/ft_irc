@@ -1,4 +1,3 @@
-
 #include "../headers/Server.hpp"
 
 void Server::handle_invite(Client &client, const std::vector<std::string> &args)

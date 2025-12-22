@@ -43,7 +43,6 @@ class Server
         int sockfd;
         std::string password;
         std::string serverName;
-
         static int stop;
 
         std::vector<Client*> clients;
@@ -114,7 +113,7 @@ class Server
         void apply_channel_mode_flags(Client &client, Channel *chan, std::vector<std::string> &args);
         void notify_channel_mode_change(Client &client, Channel* chan, const std::string &mode_string, const std::vector<std::string> &params);
 
-        void enableWriteEvent(int fd); //!
+        void enableWriteEvent(int fd); 
         void joinSingleChannel(Client &client, const std::string &channel_name, const std::string &key);
     };
     

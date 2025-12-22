@@ -1,5 +1,3 @@
-
-
 #include "../headers/Server.hpp"
 
 int Server::stop = 1;
@@ -7,6 +5,7 @@ int Server::stop = 1;
 Server::Server(int port, const std::string &password)
 {
     this->port = htons(port);
+    this->sockfd = -1;
     this->password = password;
     this->serverName = "ircserv";
     stop = 1;
@@ -30,10 +29,8 @@ Client *Server::FindClaintByFd(int fd)
 {
     for (unsigned long i = 0; i < clients.size(); i ++)
     {
-        //*
         if (clients[i]->GetFd() == fd)
             return clients[i];
-
     }
     return (NULL);
 }
@@ -42,7 +39,6 @@ Client *Server::FindClaintByName(std::string name)
 {
      for (unsigned long i = 0; i < clients.size(); i ++)
     {
-        //*
         if (clients[i]->GetNick() == name)
             return clients[i];
     }
@@ -103,13 +99,12 @@ void Server::removeClient(int fd)
         }
     }
 
-    //*
     for (size_t i = 0; i < clients.size(); i++)
     {
         if (clients[i]->GetFd() == fd)
         {
             close(clients[i]->GetFd());
-            delete clients[i]; // free memory
+            delete clients[i];
             clients.erase(clients.begin() + i);
             break;
         }
@@ -121,7 +116,6 @@ void Server::signal_handler(int)
 {
     std::cout << RED << "Server stops !" << WHITE << std::endl;
     stop = 0;
-    exit(0);
 }
 
 void Server::MainLoop()
@@ -148,7 +142,6 @@ void Server::MainLoop()
                 c = FindClaintByFd(poll_fds[i].fd);
                 if (!c->GetBuffer().empty())
                 {
-                    //the actual sending happens heere
                     ssize_t n = send(poll_fds[i].fd, c->GetBuffer().c_str(), c->GetBuffer().size(), 0);
                     if (n > 0)
                     {
@@ -160,6 +153,7 @@ void Server::MainLoop()
             }
         }
     }
+    cleanUp();
 }
 
 void Server::NewClient()
@@ -178,11 +172,10 @@ void Server::NewClient()
 
     poll_fds.push_back(nc);
     
-    //*
     Client* newC = new Client();
     newC->SetFd(new_fd);
     newC->SetIp(inet_ntoa(cliaddr.sin_addr));
-    newC->SetServer(this);     //* link to server
+    newC->SetServer(this);
 
 
     clients.push_back(newC);
@@ -224,7 +217,6 @@ void Server::NewData(int Cfd)
         buffer[bytes] = '\0';
         for (size_t i = 0; i < clients.size(); i++)
         {
-            //*
             if (clients[i]->GetFd() == Cfd)
             {
                 std::string &buff = clients[i]->GetClientBuffer();
@@ -232,10 +224,9 @@ void Server::NewData(int Cfd)
                 size_t pos;
                 while ((pos = buff.find("\r\n")) != std::string::npos)
                 {
-                    std::string cmd = buff.substr(0, pos); //eextract one command 
+                    std::string cmd = buff.substr(0, pos); 
                     buff.erase(0, pos + 2);                 
                     std::cout << "Received command: " << cmd << std::endl;
-                    //*
                     executeCmd(*clients[i], cmd);
                 }
                 break;
@@ -246,25 +237,27 @@ void Server::NewData(int Cfd)
 
 void Server::cleanUp()
 {
-    // close client sockets
     for (size_t i = 0; i < clients.size(); ++i)
     {
-        delete clients[i];
-        close(clients[i]->GetFd());
+        if (clients[i])
+        {
+            close(clients[i]->GetFd());
+            delete clients[i];
+            clients[i] = NULL;
+        }
     }
     clients.clear();
 
     for (size_t i = 0; i < channels.size(); ++i)
     {
-        delete channels[i];
+        if (channels[i])
+        {
+            delete channels[i]; 
+            channels[i] = NULL;
+        }
     }
     channels.clear();
 
-    // close server socket
-    if (sockfd != -1)
-        close(sockfd);
-
+    close(sockfd);
     poll_fds.clear();
 }
-
-

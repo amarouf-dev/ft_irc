@@ -91,7 +91,6 @@ void Server::handle_nick(Client &client, const std::vector<std::string> &args)
                }
            }
        }
-       // ghir if registered for the first time send welcome messages
        else if (client.IsAuthenticated() && !client.GetUsername().empty() && 
                 !client.GetRealname().empty())
            welcomeClient(client);

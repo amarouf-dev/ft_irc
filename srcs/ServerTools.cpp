@@ -1,17 +1,5 @@
 #include "../headers/Server.hpp"
 
-
-// void Server::sendToClient(int cFd, const std::string& message) 
-// {
-//     if (cFd == -1)
-//         return;
-//     std::string msg = message;
-//     if (msg.substr(msg.size() - 2) != "\r\n")
-//         msg += "\r\n";
-//     if (send(cFd, msg.c_str(), msg.length(), 0) == -1)
-//         std::cout << "Send failed " << std::endl;
-// }
-
 std::string &Server::cmdToUppercase(std::string &str)
 {
     for (size_t i = 0; i < str.size(); i++)
@@ -63,7 +51,6 @@ std::vector<std::string> Server::get_arg(std::string cmd)
 
     return args;
 }
-
 
 void Server::executeCmd(Client& client, const std::string& cmd)
 {

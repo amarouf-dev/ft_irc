@@ -10,7 +10,6 @@ CMD_DIR = cmds
 
 HDR = 	$(HDIR)/Client.hpp  $(HDIR)/Server.hpp $(HDIR)/Channel.hpp $(HDIR)/NumericReplies.hpp\
 
-
 CSRC =	$(SRCDIR)/jokeBot.cpp \
 
 SRC =	$(SRCDIR)/main.cpp $(SRCDIR)/Client.cpp $(SRCDIR)/Server.cpp $(SRCDIR)/Channel.cpp \

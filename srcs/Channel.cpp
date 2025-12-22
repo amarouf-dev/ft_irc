@@ -1,21 +1,9 @@
-
 #include "../headers/Channel.hpp"
 
-// Channel::Channel(const std::string &chanName) : name(chanName)  {}
 Channel::Channel(const std::string &chanName) 
     : name(chanName), topic(""), inviteonly(false), topic_restricted(false),     
     has_key(false), key(""), has_mem_lim(false), mem_lim(0) {}
-
-// void Channel::addClient(Client *client)
-// {
-// 	if (members.find(client) != members.end())
-// 		return ;
-//     members.insert(client);
-//     if (members.size() == 1)
-//         operators.insert(client);
-// }
-
-//******* 
+ 
 void Channel::addClient(Client *client)
 {
     if (members.find(client) != members.end())
@@ -25,7 +13,6 @@ void Channel::addClient(Client *client)
     if (members.size() == 1)
         operators.insert(client);
     
-    // Remove from invited list once they join
     if (invited.find(client) != invited.end())
         invited.erase(client);
 }
@@ -33,7 +20,6 @@ void Channel::addClient(Client *client)
 void Channel::removeClaint(Client *client)
 {
     members.erase(client);
-    //******** 
     operators.erase(client);
     invited.erase(client); 
 

@@ -24,7 +24,7 @@ class Channel
         
         std::set<Client*> members;
         std::set<Client*> operators;
-        std::set<Client*> invited; // track invited users 
+        std::set<Client*> invited;
 
     public:
 

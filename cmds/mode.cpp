@@ -28,7 +28,6 @@ void Server::handle_mode(Client &client, std::vector<std::string> &args)
             return;
         }
 
-        // if no mode string provided, return current modes
         if (args.size() == 2)
         {
             std::string mode_str = "+";
