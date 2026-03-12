@@ -65,12 +65,12 @@ nc localhost 6667
 ```
 ## Learning Goals
 
-  This project focuses on:
-  Network programming
-  Socket API
-  poll / select
-  Protocol implementation
-  Multi-client server architecture
-  Object-oriented design in C++98
-  Memory management
-  Error handling
+This project focuses on:
+- Network programming
+- Socket API
+- poll / select
+- Protocol implementation
+- Multi-client server architecture
+- Object-oriented design in C++98
+- Memory management
+- Error handling
